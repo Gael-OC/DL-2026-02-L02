@@ -18,3 +18,6 @@ docente/
 
 # Presentaciones del laboratorio (solo en local).
 presentation/
+
+# Archivos locales de trabajo.
+.local/

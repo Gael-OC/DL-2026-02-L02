@@ -1,5 +1,7 @@
 # DL-2026-02-L02
 
+Organización del equipo: [plan, tareas y registro de avances](PLAN_LABORATORIO.md).
+
 Proyecto base del **Laboratorio 02 de Deep Learning** (segundo semestre 2026):
 redes con una **capa convolucional 1D** para predecir la etapa de deterioro
 cognitivo (escala GDS) a partir de 15 respuestas binarias de un test de
