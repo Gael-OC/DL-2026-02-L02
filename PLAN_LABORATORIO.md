@@ -27,8 +27,8 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 25/10/2026:** H0.1 y H0.2 terminadas; H0.3 en revisión, con una
-propuesta pendiente de confirmar con Johan. Las demás tareas siguen pendientes.
+**Estado al 25/10/2026:** H0.1, H0.2 y H0.3 terminadas. Reparto de trabajo
+confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
 
@@ -39,7 +39,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 |---|---|---|---|---|---|---|
 | [x] | H0.1 Organización documental | Gael | 24/10 | — | terminada | Este plan, enlace en README y comprobación documental |
 | [x] | H0.2 Entorno y arranque | Gael | 24/10 | H0.1 | terminada | 25/10: prueba Softmax/R2 correcta; log y reportes en results/h0_arranque/ |
-| [ ] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | en revisión | Propuesta de trabajo preparada; falta confirmación de Johan |
+| [x] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | terminada | 25/10: revisión técnica y reparto confirmado por ambos |
 | [ ] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | pendiente | — |
@@ -241,7 +241,7 @@ acordado. Las incertidumbres del instrumento se exponen como limitaciones.
 ## 4. Propuesta de trabajo
 
 El taller consiste en comparar modelos que predicen una categoría a partir de
-15 respuestas. Para repartir el trabajo, proponemos lo siguiente:
+15 respuestas. El reparto general se confirmó el 25/10:
 
 | Quién | De qué se encarga |
 |---|---|
@@ -275,9 +275,9 @@ en la sección 7.
   los modelos y juntar sus resultados (G3). Hasta entonces usamos las funciones
   que ya tiene la plantilla.
 
-H0.3 estará terminada cuando ambos confirmen el reparto, las fechas y cómo
-juntarán el trabajo. Falta la respuesta de Johan; cualquier cambio se anota
-en el registro de avances.
+H0.3 cerrada el 25/10 tras la confirmación de Johan al reparto general y al
+trabajo conjunto en el informe. Las tareas y fechas del tablero se mantienen;
+cualquier ajuste posterior se anota en el registro de avances.
 
 ### Archivos de cada integrante
 
@@ -951,7 +951,7 @@ prueba corta no convierte un experimento final en terminado.
 |---|---|---|---|
 | H0.1 | Gael | 23/10: plan de trabajo y enlace desde README revisados | H0.2 |
 | H0.2 | Gael | 25/10: entorno verificado y prueba Softmax/R2 completada; dos folds externos, métricas finitas y reportes legibles | H0.3 con Johan |
-| H0.3 | Gael | 25/10: reprogramada del 24 al 25; propuesta de trabajo preparada. Revisado que el código permite compartir los datos y separar entrenamiento y evaluación | Confirmación o correcciones de Johan sobre el reparto, las fechas y cómo juntar el trabajo |
+| H0.3 | Gael y Johan | 25/10: revisión técnica completada y reparto general confirmado por Johan; informe compartido. Se mantienen las tareas y fechas del tablero | Gael: G1.1/G1.2. Johan: J1.1/J1.2 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 
