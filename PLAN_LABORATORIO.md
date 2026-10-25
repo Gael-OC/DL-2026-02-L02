@@ -27,13 +27,8 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. Cada integrante
 redacta la metodología y discusión de sus estudios; Gael integra el informe.
 
-Las comprobaciones se realizan mediante código ejecutable, pruebas automáticas,
-inspección de artefactos e interpretación de resultados. No se requieren
-ejercicios ni cálculos a mano.
-
-**Estado inicial:** la organización documental H0.1 está terminada. El resto
-del laboratorio permanece pendiente; H0 no se considera completo hasta cerrar
-H0.2 y H0.3.
+**Estado al 25/10/2026:** H0.1 y H0.2 están terminadas. El resto del laboratorio
+permanece pendiente; H0 no se considera completo hasta cerrar H0.3.
 
 ### Tablero de tareas
 
@@ -43,8 +38,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | Hecho | Ficha | Responsable | Fecha interna | Depende de | Estado | Evidencia de cierre |
 |---|---|---|---|---|---|---|
 | [x] | H0.1 Organización documental | Gael | 24/10 | — | terminada | Este plan, enlace en README y comprobación documental |
-| [ ] | H0.2 Entorno y arranque | Gael | 24/10 | H0.1 | pendiente | — |
-| [ ] | H0.3 Contrato técnico | Gael y Johan | 24/10 | H0.1 | pendiente | — |
+| [x] | H0.2 Entorno y arranque | Gael | 24/10 | H0.1 | terminada | 25/10: prueba Softmax/R2 correcta; log y reportes en results/h0_arranque/ |
+| [ ] | H0.3 Contrato técnico | Gael y Johan | 25/10 | H0.1 | pendiente | — |
 | [ ] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | pendiente | — |
@@ -341,7 +336,7 @@ CSV/Markdown/PNG creados. Registrar el comando completo en la bitácora.
 
 ### H0.3 — Revisar el contrato de trabajo
 
-**Responsables:** Gael y Johan. **Fecha:** 24/10. **Duración:** 45–60 min.
+**Responsables:** Gael y Johan. **Fecha:** 25/10. **Duración:** 45–60 min.
 **Insumos:** secciones 3 y 4, módulos actuales de datos y particiones.
 
 1. Revisar cómo se obtienen X, y, clases e índices sin cambiar sus significados.
@@ -888,7 +883,27 @@ prueba corta no convierte un experimento final en terminado.
 
 | Ficha | Responsable | Avance y evidencia | Falta o siguiente paso |
 |---|---|---|---|
-| H0.1 | Gael | 23/10/2026: plan, tablero, 37 fichas y enlace desde README; campos, dependencias sin ciclos, enlaces y formato comprobados automáticamente | H0.2: registrar entorno y ejecutar arranque corto |
+| H0.1 | Gael | 23/10: plan de trabajo y enlace desde README revisados | H0.2 |
+| H0.2 | Gael | 25/10: entorno verificado y prueba Softmax/R2 completada; dos folds externos, métricas finitas y reportes legibles | H0.3 con Johan |
+| H0.3 | Gael | 25/10: fecha cambiada del 24 al 25 de octubre | Revisar juntos el contrato técnico |
+
+### Registro de arranque H0.2 — 25/10/2026
+
+Entorno `lab_pytorch`: Python 3.10.21, PyTorch 2.14.0 y NumPy 2.2.6.
+Prueba en CPU con semilla 42, una época y dos folds externos e internos.
+Terminó sin errores en 9.37 s. Es una prueba de funcionamiento, no un resultado final.
+El SHA-256 del SAV coincide con la referencia:
+`b454a4e5c997be26edb3a187605c2c10da1147ac1ce6cea76d42adbe68b17474`.
+
+Comando desde la raíz del repositorio, con el entorno activo:
+
+```bash
+python main.py --data-path 'dataset/15 atributos R0-R5.sav' --target-name GDS_R2 --algorithm conv1d_softmax --epochs 1 --no-grid --outer-folds 2 --inner-folds 2 --output-dir results/h0_arranque
+```
+
+Log, versiones y reportes conservados localmente en `results/h0_arranque/`.
+El comando exacto ejecutado está en `comando.txt` de esa carpeta.
+`--no-grid` mantiene la evaluación interna. La confusión muestra solo el último fold.
 
 ## 9. Fuentes de referencia
 
