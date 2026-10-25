@@ -24,8 +24,8 @@ de cómputo.
    el comando, el error y lo que se intentó.
 
 Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
-Cambiar responsables o fechas mediante un acuerdo registrado. Cada integrante
-redacta la metodología y discusión de sus estudios; Gael integra el informe.
+Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
+redacta entre ambos, con partes repartidas y revisión final conjunta.
 
 **Estado al 25/10/2026:** H0.1 y H0.2 terminadas; H0.3 en revisión, con una
 propuesta pendiente de confirmar con Johan. Las demás tareas siguen pendientes.
@@ -245,9 +245,13 @@ El taller consiste en comparar modelos que predicen una categoría a partir de
 
 | Quién | De qué se encarga |
 |---|---|
-| Gael | Revisar los datos, completar el modelo CORAL, preparar la evaluación y juntar los resultados y el informe final. |
+| Gael | Revisar los datos, completar el modelo CORAL y preparar la evaluación común de los modelos. |
 | Johan | Probar modelos más sencillos para comparar y estudiar si cambiar el orden de las 15 preguntas afecta los resultados. |
-| Ambos | Explicar qué hicieron, interpretar sus resultados y escribir su parte del informe. |
+| Ambos | Repartir la redacción, explicar sus resultados y juntar y revisar el informe final entre los dos. |
+
+El informe sigue la plantilla del laboratorio. Cada uno prepara borradores de
+sus partes; ambos revisan el documento completo. El reparto por sección está
+en la sección 7.
 
 ### Cómo vamos a trabajar
 
@@ -787,8 +791,9 @@ comparación y límite; incluir resultados desfavorables y no mezclar tareas dis
 **Responsables:** Gael y Johan. **Fecha:** 10/11. **Duración:** dos bloques de
 90–120 min, uno por integrante. **Insumos:** borradores y agregados finales.
 
-1. Cada integrante termina sus secciones; Gael integra formato y referencias.
-2. Comprobar requisitos, siete preguntas mínimas y correspondencia de figuras/tablas.
+1. Cada integrante termina sus borradores según el reparto de la sección 7.
+2. Ambos juntan las secciones, revisan el texto completo, las referencias y el formato.
+3. Comprobar requisitos, siete preguntas mínimas y correspondencia de figuras/tablas.
 
 **Entregable:** informe PDF y fuentes.
 **Comprobación:** compilación/exportación, inspección del PDF y checklist de sección 7.
@@ -872,16 +877,33 @@ una ficha si excede dos horas de trabajo activo.
 
 ## 7. Informe y aceptación final
 
-### Estructura del informe
+### Reparto de las secciones
 
-1. Problema, objetivos, datos y límites de interpretación.
-2. Conv1D: formas, vecindad, compartición, parámetros y Flatten.
-3. CORAL, pérdida y ponderación.
-4. Validación, selección y excepción GDS.
-5. Seis tablas obligatorias y estabilidad del grid.
-6. Decisión, controles, perfiles y localidad.
-7. Discusión, resultados negativos, limitaciones y conclusiones.
-8. Referencias y procedimiento de reproducción.
+Propuesta basada en la plantilla del laboratorio, pendiente de confirmar entre
+ambos. La columna de responsable indica quién prepara el primer borrador;
+el informe completo se revisa entre los dos.
+
+| Sección | Primer borrador | Máximo según la plantilla |
+|---|---|---|
+| Resumen | Ambos, al terminar el resto del informe | No indicado |
+| Introducción | Johan: problema, objetivos y herramientas utilizadas | 1 página |
+| Marco teórico | Gael explica Conv1D y CORAL; Johan, los modelos de comparación | 1 página |
+| Metodología | Gael describe datos y evaluación; cada uno explica sus experimentos | 2 páginas |
+| Resultados | Cada uno presenta las tablas, gráficos y explicación de sus experimentos | 3 páginas |
+| Discusión | Ambos: qué significan los resultados, sus diferencias y limitaciones | 1 página |
+| Conclusiones | Ambos: principales hallazgos y aprendizajes | 1 página |
+| Código y reproducibilidad | Cada uno explica su código; ambos comprueban cómo repetir el trabajo | 1 página |
+
+En metodología y resultados, Gael cubre CORAL, comparación obligatoria,
+decisiones, perfiles y robustez; Johan cubre los modelos de comparación y el
+efecto del orden de las preguntas. Incluir las seis tablas obligatorias, las
+configuraciones elegidas y su estabilidad, además de responder las siete
+preguntas siguientes.
+
+Ambos completan las referencias y la rúbrica de autoevaluación de la plantilla.
+Los anexos son opcionales y pueden reunir tablas completas, detalles de pruebas
+y gráficos adicionales. Al juntar el informe, ambos revisan que las partes
+conecten, se respeten los límites de páginas y el PDF final sea legible.
 
 ### Siete preguntas mínimas
 
