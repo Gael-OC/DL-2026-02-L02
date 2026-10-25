@@ -27,8 +27,8 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. Cada integrante
 redacta la metodología y discusión de sus estudios; Gael integra el informe.
 
-**Estado al 25/10/2026:** H0.1 y H0.2 están terminadas. El resto del laboratorio
-permanece pendiente; H0 no se considera completo hasta cerrar H0.3.
+**Estado al 25/10/2026:** H0.1 y H0.2 terminadas; H0.3 en revisión, con una
+propuesta pendiente de confirmar con Johan. Las demás tareas siguen pendientes.
 
 ### Tablero de tareas
 
@@ -39,7 +39,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 |---|---|---|---|---|---|---|
 | [x] | H0.1 Organización documental | Gael | 24/10 | — | terminada | Este plan, enlace en README y comprobación documental |
 | [x] | H0.2 Entorno y arranque | Gael | 24/10 | H0.1 | terminada | 25/10: prueba Softmax/R2 correcta; log y reportes en results/h0_arranque/ |
-| [ ] | H0.3 Contrato técnico | Gael y Johan | 25/10 | H0.1 | pendiente | — |
+| [ ] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | en revisión | Propuesta de trabajo preparada; falta confirmación de Johan |
 | [ ] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | pendiente | — |
 | [ ] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | pendiente | — |
@@ -238,7 +238,44 @@ No se incluyen CORN, pérdidas adicionales, calibración, conformalidad, modelos
 de texto ni generación sintética en esta ejecución. Primero cerrar el estudio
 acordado. Las incertidumbres del instrumento se exponen como limitaciones.
 
-## 4. Contrato técnico y separación del trabajo
+## 4. Propuesta de trabajo
+
+El taller consiste en comparar modelos que predicen una categoría a partir de
+15 respuestas. Para repartir el trabajo, proponemos lo siguiente:
+
+| Quién | De qué se encarga |
+|---|---|
+| Gael | Revisar los datos, completar el modelo CORAL, preparar la evaluación y juntar los resultados y el informe final. |
+| Johan | Probar modelos más sencillos para comparar y estudiar si cambiar el orden de las 15 preguntas afecta los resultados. |
+| Ambos | Explicar qué hicieron, interpretar sus resultados y escribir su parte del informe. |
+
+### Cómo vamos a trabajar
+
+- Usaremos los mismos datos y la misma separación entre filas de entrenamiento
+  y de evaluación para todos los modelos. Así podremos comparar sus resultados
+  en las mismas condiciones.
+- Cada uno guardará sus predicciones y resultados. Gael preparará las funciones
+  comunes para juntarlos y construir las tablas y gráficos del informe.
+- Los resultados completos se guardan en carpetas separadas de `results/`.
+  Al repositorio subimos las tablas y gráficos elegidos para el informe.
+- Cada uno trabaja en sus archivos. Si hace falta cambiar una parte compartida
+  del código, lo acordamos antes.
+
+### Próximos pasos
+
+- **Gael, 26/10:** revisar los datos y comprobar cómo funciona la red entregada
+  en la plantilla (G1.1 y G1.2).
+- **Johan, 27/10:** preparar los primeros modelos de comparación: uno que siempre
+  responde lo mismo y otros que usan regresión logística (J1.1 y J1.2).
+- **Gael, 31/10:** dejar listas las funciones y archivos comunes para evaluar
+  los modelos y juntar sus resultados (G3). Hasta entonces usamos las funciones
+  que ya tiene la plantilla.
+
+H0.3 estará terminada cuando ambos confirmen el reparto, las fechas y cómo
+juntarán el trabajo. Falta la respuesta de Johan; cualquier cambio se anota
+en el registro de avances.
+
+### Archivos de cada integrante
 
 Gael mantiene `main.py`, `src/`, validación y reportes comunes. Johan desarrolla
 sus controles y localidad en `experimentos/controles.py` y
@@ -251,9 +288,13 @@ ya disponibles. Acordar cualquier cambio de los módulos compartidos.
 - Entrada: X `(N,15)` float32, en el orden docente; y `(N,)` int64 en `0..K−1`.
 - `row_id`: posición original de fila, base cero, ligada al hash del SAV. El ID
   original nunca entra en X. Conservar el mapa de clases originales e índices.
-- Para avanzar antes de G3, reutilizar `prepare_experiment_data` y
-  `StratifiedSplitter` de la plantilla, con las semillas fijadas. No crear otra
-  recodificación ni otro protocolo de partición.
+- Para avanzar antes de G3, reutilizar `prepare_experiment_data`, que devuelve
+  `ExperimentData` con `X`, `y` y `classes`, y `StratifiedSplitter` de la plantilla.
+  No crear otra recodificación ni otro protocolo de partición.
+- En los controles de R2, conservar los cinco folds externos con semilla 42.
+  Los tres internos usan `42 + 100 * outer_fold`, numerando externos desde 1,
+  como en la plantilla. Sus índices son locales al entrenamiento externo:
+  convertirlos a filas globales mediante `train_idx[inner_idx]`.
 - G3 exportará índices en la numeración global de filas. Cada inner fold estará
   contenido en el entrenamiento externo. Los controles consumirán esas mismas
   particiones y verificarán que coincidan con las que usaron al comenzar.
@@ -334,18 +375,21 @@ python main.py --data-path 'dataset/15 atributos R0-R5.sav' --target-name GDS_R2
 **Aceptación:** código de salida cero, dos folds externos, métricas finitas y
 CSV/Markdown/PNG creados. Registrar el comando completo en la bitácora.
 
-### H0.3 — Revisar el contrato de trabajo
+### H0.3 — Acordar el trabajo del equipo
 
 **Responsables:** Gael y Johan. **Fecha:** 25/10. **Duración:** 45–60 min.
-**Insumos:** secciones 3 y 4, módulos actuales de datos y particiones.
+**Insumos:** protocolo de la sección 3 y propuesta de trabajo de la sección 4.
 
-1. Revisar cómo se obtienen X, y, clases e índices sin cambiar sus significados.
-2. Confirmar módulos de cada integrante, nombres de salidas y dependencias.
-3. Registrar cualquier ajuste antes de comenzar a producir resultados compatibles.
+1. Revisar qué hará cada uno y para cuándo.
+2. Confirmar que usaremos los mismos datos y la misma forma de evaluar, y cómo
+   guardaremos y juntaremos los resultados.
+3. Anotar la confirmación de ambos o los cambios que necesite la propuesta.
 
-**Entregable:** nota de revisión en la bitácora y contrato actualizado si procede.
-**Comprobación:** contrastar firmas y formas con la plantilla y el protocolo.
-**Aceptación:** ambos conocen los insumos y salidas de su siguiente ficha.
+**Entregable:** reparto y fechas confirmados en el registro de avances.
+**Comprobación:** revisar que la forma de trabajar propuesta encaje con el código
+de la plantilla y con las comparaciones del taller.
+**Aceptación:** ambos saben cuál es su siguiente tarea, qué necesitan para
+empezar y qué deben entregar.
 
 ### G1.1 — Auditoría reproducible de datos
 
@@ -885,7 +929,7 @@ prueba corta no convierte un experimento final en terminado.
 |---|---|---|---|
 | H0.1 | Gael | 23/10: plan de trabajo y enlace desde README revisados | H0.2 |
 | H0.2 | Gael | 25/10: entorno verificado y prueba Softmax/R2 completada; dos folds externos, métricas finitas y reportes legibles | H0.3 con Johan |
-| H0.3 | Gael | 25/10: fecha cambiada del 24 al 25 de octubre | Revisar juntos el contrato técnico |
+| H0.3 | Gael | 25/10: reprogramada del 24 al 25; propuesta de trabajo preparada. Revisado que el código permite compartir los datos y separar entrenamiento y evaluación | Confirmación o correcciones de Johan sobre el reparto, las fechas y cómo juntar el trabajo |
 
 ### Registro de arranque H0.2 — 25/10/2026
 
