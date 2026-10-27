@@ -15,6 +15,10 @@ primera etapa organiza el trabajo; el desarrollo y los experimentos avanzan por
 fichas pequeñas. Las duraciones son estimaciones de trabajo activo, no tiempos
 de cómputo.
 
+Para mantener el repositorio fácil de leer, actualizar las guías existentes
+cuando corresponda; no crear un documento por cada ficha. Guardar las salidas
+generadas en `results/` y compartir solo tablas o figuras finales seleccionadas.
+
 1. Elegir una ficha cuyas dependencias estén completas.
 2. Cambiar su estado a **en curso** y realizar los pasos indicados.
 3. Ejecutar su comprobación y guardar la evidencia.
@@ -27,7 +31,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 26/10/2026:** H0.1, H0.2, H0.3 y G1.1 terminadas. Reparto de trabajo
+**Estado al 26/10/2026:** H0.1, H0.2, H0.3, G1.1 y G1.2 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -40,8 +44,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | H0.1 Organización documental | Gael | 24/10 | — | terminada | Este plan, enlace en README y comprobación documental |
 | [x] | H0.2 Entorno y arranque | Gael | 24/10 | H0.1 | terminada | 25/10: prueba Softmax/R2 correcta; log y reportes en results/h0_arranque/ |
 | [x] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | terminada | 25/10: revisión técnica y reparto confirmado por ambos |
-| [x] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | terminada | Script, pruebas y resumen agregado en `docs/auditoria_datos.json` |
-| [ ] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | pendiente | — |
+| [x] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | terminada | Script y pruebas; resumen en `docs/01_problema.md` |
+| [x] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | terminada | Inspección y pruebas; explicación en `docs/02_arquitectura.md` |
 | [ ] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | pendiente | — |
 | [ ] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | pendiente | — |
 | [ ] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | pendiente | — |
@@ -952,7 +956,8 @@ prueba corta no convierte un experimento final en terminado.
 | H0.1 | Gael | 23/10: plan de trabajo y enlace desde README revisados | H0.2 |
 | H0.2 | Gael | 25/10: entorno verificado y prueba Softmax/R2 completada; dos folds externos, métricas finitas y reportes legibles | H0.3 con Johan |
 | H0.3 | Gael y Johan | 25/10: revisión técnica completada y reparto general confirmado por Johan; informe compartido. Se mantienen las tareas y fechas del tablero | Gael: G1.1/G1.2. Johan: J1.1/J1.2 |
-| G1.1 | Gael | 26/10: auditoría reproducible y cinco pruebas aprobadas; resumen agregado en `docs/auditoria_datos.json` | G1.2 |
+| G1.1 | Gael | 26/10: auditoría reproducible y cinco pruebas aprobadas; resumen en la guía de datos | G1.2 |
+| G1.2 | Gael | 26/10: formas, parámetros y ventanas comprobadas; cinco pruebas aprobadas | G2.1/G2.2 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 

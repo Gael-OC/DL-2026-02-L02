@@ -48,6 +48,18 @@ Parametros con la configuracion por defecto y K = 3:
 | Linear 32→3 | 32·3+3 | 99 |
 | **Total** | | **17219** |
 
+El MLP concentra 15392 parámetros (89,4 % del total). Para inspeccionar las
+formas, los parámetros y un ejemplo de ventana con datos artificiales:
+
+```bash
+python experimentos/inspeccionar_arquitectura.py
+```
+
+El ejemplo usa el kernel `[1, 2, 3]` sobre `[6, 7, 8]` y obtiene 44. Dos
+convoluciones de tamaño 3 abarcan cinco posiciones locales. En entrenamiento,
+BatchNorm también usa estadísticas del lote y las posiciones; la capa densa
+posterior combina todas las posiciones. La salida final son logits.
+
 ### Por que `Flatten` y no pooling global
 
 Un `AdaptiveAvgPool1d(1)` descartaria la posicion: el modelo sabria que un

@@ -26,6 +26,15 @@ Las etapas estan **ordenadas**: confundir la etapa 2 con la 3 no es lo mismo
 que confundir la 2 con la 7. Accuracy trata ambos errores igual; MAE, QWK y
 errores graves no.
 
+La auditoría encontró 321 perfiles de respuestas; 97 tienen más de una etiqueta
+GDS y reúnen 851 filas. No se observaron valores ausentes; el SAV declara GDS=0
+como ausencia. Las cinco agrupaciones coinciden con GDS y el ID no entra en X.
+Para repetir la revisión y guardar el resumen agregado en `results/`:
+
+```bash
+python experimentos/auditoria_datos.py 'dataset/15 atributos R0-R5.sav' --salida results/g1_auditoria/resumen.json
+```
+
 ## Seis experimentos independientes
 
 Cada columna objetivo es un experimento distinto (un modelo por columna):

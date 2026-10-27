@@ -65,6 +65,10 @@ python main.py --data-path "dataset/15 atributos R0-R5.sav" --target-name GDS_R2
 python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets
 ```
 
+Para revisar los datos y la arquitectura antes de entrenar, consulta
+[el problema](docs/01_problema.md) y [la arquitectura](docs/02_arquitectura.md).
+Las pruebas se ejecutan con `python -m unittest discover -s tests -v`.
+
 ## Estructura
 
 ```text
