@@ -4,6 +4,7 @@ __pycache__/
 .mypy_cache/
 .venv/
 venv/
+.vscode/
 
 # Datos: pesados o sensibles. La carpeta sí se versiona (README.md).
 dataset/*

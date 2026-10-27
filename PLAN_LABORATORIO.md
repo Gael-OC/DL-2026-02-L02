@@ -46,8 +46,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | terminada | 25/10: revisión técnica y reparto confirmado por ambos |
 | [x] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | terminada | Script y pruebas; resumen en `docs/01_problema.md` |
 | [x] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | terminada | Inspección y pruebas; explicación en `docs/02_arquitectura.md` |
-| [ ] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | pendiente | — |
-| [ ] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | pendiente | — |
+| [x] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | terminada | Implementado ConstantPredictor (moda con desempate a índice menor, mediana y distribución previa) y pruebas en tests/test_controles.py.
+| [x] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | terminada | Implementado LogisticControlPredictor para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas.
 | [ ] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | pendiente | — |
 | [ ] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | pendiente | — |
 | [ ] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | pendiente | — |
@@ -958,6 +958,8 @@ prueba corta no convierte un experimento final en terminado.
 | H0.3 | Gael y Johan | 25/10: revisión técnica completada y reparto general confirmado por Johan; informe compartido. Se mantienen las tareas y fechas del tablero | Gael: G1.1/G1.2. Johan: J1.1/J1.2 |
 | G1.1 | Gael | 26/10: auditoría reproducible y cinco pruebas aprobadas; resumen en la guía de datos | G1.2 |
 | G1.2 | Gael | 26/10: formas, parámetros y ventanas comprobadas; cinco pruebas aprobadas | G2.1/G2.2 |
+| J1.1 | Johan | 27/10: Implementación de moda con desempate a índice menor, mediana y distribución previa + pruebas | J1.2 |
+| J1.2 | Johan | 27/10: Implementación para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas. | J2.1/J2.2/J2.3 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 
