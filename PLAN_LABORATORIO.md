@@ -13,7 +13,8 @@ el día 11. Todas las fechas de este documento corresponden a 2026.
 Este documento reúne el protocolo, las tareas y el registro de avances. La
 primera etapa organiza el trabajo; el desarrollo y los experimentos avanzan por
 fichas pequeñas. Las duraciones son estimaciones de trabajo activo, no tiempos
-de cómputo.
+de cómputo. Las fechas internas son plazos máximos: se puede avanzar antes si
+las dependencias están completas.
 
 Para mantener el repositorio fácil de leer, actualizar las guías existentes
 cuando corresponda; no crear un documento por cada ficha. Guardar las salidas
@@ -31,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 26/10/2026:** H0.1, H0.2, H0.3, G1.1 y G1.2 terminadas. Reparto de trabajo
+**Estado al 27/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2 y G2.1 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -46,9 +47,9 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | H0.3 Acuerdo de trabajo | Gael y Johan | 25/10 | H0.1 | terminada | 25/10: revisión técnica y reparto confirmado por ambos |
 | [x] | G1.1 Auditoría de datos | Gael | 26/10 | H0.2 | terminada | Script y pruebas; resumen en `docs/01_problema.md` |
 | [x] | G1.2 Formas y parámetros | Gael | 26/10 | H0.2 | terminada | Inspección y pruebas; explicación en `docs/02_arquitectura.md` |
-| [x] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | terminada | Implementado ConstantPredictor (moda con desempate a índice menor, mediana y distribución previa) y pruebas en tests/test_controles.py.
-| [x] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | terminada | Implementado LogisticControlPredictor para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas.
-| [ ] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | pendiente | — |
+| [x] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | terminada | Implementado ConstantPredictor (moda con desempate a índice menor, mediana y distribución previa) y pruebas en tests/test_controles.py. |
+| [x] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | terminada | Implementado LogisticControlPredictor para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas. |
+| [x] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | terminada | Funciones y pruebas en `tests/test_coral.py`; suite completa aprobada el 27/10 |
 | [ ] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | pendiente | — |
 | [ ] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | pendiente | — |
 | [ ] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | pendiente | — |
@@ -960,6 +961,7 @@ prueba corta no convierte un experimento final en terminado.
 | G1.2 | Gael | 26/10: formas, parámetros y ventanas comprobadas; cinco pruebas aprobadas | G2.1/G2.2 |
 | J1.1 | Johan | 27/10: Implementación de moda con desempate a índice menor, mediana y distribución previa + pruebas | J1.2 |
 | J1.2 | Johan | 27/10: Implementación para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas. | J2.1/J2.2/J2.3 |
+| G2.1 | Gael | 27/10: niveles acumulativos e inferencia implementados; pruebas para K=2,3,7 y umbrales aprobadas | G2.2 y G2.3 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 

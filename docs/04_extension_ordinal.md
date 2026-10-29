@@ -1,8 +1,9 @@
 # 4. Extension ordinal (TODO del alumno)
 
 El experimento `conv1d_coral` reutiliza todo lo entregado (datos, tronco
-Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). Solo faltan
-la cabeza CORAL y las funciones ordinales.
+Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). Faltan
+la cabeza CORAL, la perdida y los pesos por clase; los niveles y la inferencia
+ya estan implementados.
 
 ## Idea de CORAL
 
@@ -15,15 +16,15 @@ la cabeza CORAL y las funciones ordinales.
 - Como todos los umbrales comparten `w`, las probabilidades quedan ordenadas
   (consistencia de rango).
 
-## Esqueletos a completar
+## Funciones y esqueletos
 
 | Orden | Archivo | Firma | Formas |
 |---|---|---|---|
-| 1 | `src/tasks/ordinal_task.py` | `labels_to_levels(labels, num_classes)` | `(B,) -> (B, K-1)` |
+| 1 | `src/tasks/ordinal_task.py` | `labels_to_levels(labels, num_classes)` (implementada) | `(B,) -> (B, K-1)` |
 | 2 | `src/models/coral.py` | `CoralLayer(input_size, num_classes)` | `(B, H) -> (B, K-1)` |
 | 3 | `src/models/coral.py` | `Conv1DCoralNet(...)` | `(B, 15) -> (B, K-1)` |
 | 4 | `src/tasks/ordinal_task.py` | `coral_loss(logits, labels, num_classes, class_weights=None)` | escalar |
-| 5 | `src/tasks/ordinal_task.py` | `logits_to_ordinal_predictions(logits, threshold=0.5)` | `(B, K-1) -> (B,)` |
+| 5 | `src/tasks/ordinal_task.py` | `logits_to_ordinal_predictions(logits, threshold=0.5)` (implementada) | `(B, K-1) -> (B,)` |
 | 6 | `src/tasks/ordinal_task.py` | `effective_number_weights(labels, num_classes, beta=0.99)` | `(N,) -> (K,)` |
 
 `CoralTask`, `CoralLoss`, `ModelFactory` y `TaskFactory` **ya estan

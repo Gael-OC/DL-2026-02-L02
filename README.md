@@ -42,8 +42,7 @@ estrategia de entrenamiento (`ClassificationTask`).
 ## Que queda como TODO (alumno)
 
 - `CoralLayer` y `Conv1DCoralNet` en `src/models/coral.py`.
-- `labels_to_levels`, `coral_loss`, `effective_number_weights` y
-  `logits_to_ordinal_predictions` en `src/tasks/ordinal_task.py`.
+- `coral_loss` y `effective_number_weights` en `src/tasks/ordinal_task.py`.
 - Comparar `conv1d_softmax` y `conv1d_coral` (con y sin pesos) en los seis
   objetivos y completar el informe.
 

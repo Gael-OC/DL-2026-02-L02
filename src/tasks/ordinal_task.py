@@ -2,12 +2,7 @@
 Tarea ordinal CORAL.
 
 La clase CoralTask ya conecta la perdida y la prediccion con el Trainer.
-Las cuatro funciones matematicas son TODO(alumno):
-
-1. labels_to_levels
-2. coral_loss
-3. effective_number_weights
-4. logits_to_ordinal_predictions
+Quedan pendientes la perdida y los pesos por clase.
 """
 
 from __future__ import annotations
@@ -21,7 +16,6 @@ from src.tasks.base import ClassificationTask, LossFunction
 
 def labels_to_levels(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
     """
-    TODO(alumno):
     Convierte clases enteras a umbrales binarios acumulativos.
 
     Ejemplo:
@@ -32,9 +26,8 @@ def labels_to_levels(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
     - salida: (batch_size, num_classes - 1) float32
     """
 
-    raise NotImplementedError(
-        "TODO(alumno): implementar labels_to_levels() en src/tasks/ordinal_task.py."
-    )
+    thresholds = torch.arange(num_classes - 1, device=labels.device)
+    return (labels.unsqueeze(1) > thresholds).to(torch.float32)
 
 
 def coral_loss(
@@ -96,7 +89,6 @@ def logits_to_ordinal_predictions(
     threshold: float = 0.5,
 ) -> torch.Tensor:
     """
-    TODO(alumno):
     Convierte logits CORAL en una clase entera.
 
     Pista:
@@ -108,10 +100,7 @@ def logits_to_ordinal_predictions(
     - salida: (batch_size,) int64
     """
 
-    raise NotImplementedError(
-        "TODO(alumno): implementar logits_to_ordinal_predictions() "
-        "en src/tasks/ordinal_task.py."
-    )
+    return (torch.sigmoid(logits) > threshold).sum(dim=1)
 
 
 class CoralLoss:
@@ -134,7 +123,7 @@ class CoralTask(ClassificationTask):
     Clasificacion ordinal con K-1 umbrales acumulativos.
 
     Ya entregado: la conexion con el Trainer y el calculo de pesos por fold.
-    TODO(alumno): las funciones de este modulo que lanzan NotImplementedError.
+    Pendientes: perdida y pesos por clase.
 
     Formas:
         logits: (B, K-1)
