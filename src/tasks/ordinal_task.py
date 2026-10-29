@@ -2,13 +2,14 @@
 Tarea ordinal CORAL.
 
 La clase CoralTask ya conecta la perdida y la prediccion con el Trainer.
-Quedan pendientes la perdida y los pesos por clase.
+Quedan pendientes los pesos por numero efectivo.
 """
 
 from __future__ import annotations
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 from src.config import TrainingConfig
 from src.tasks.base import ClassificationTask, LossFunction
@@ -37,7 +38,6 @@ def coral_loss(
     class_weights: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """
-    TODO(alumno):
     BCE con logits sobre los K-1 umbrales ordinales.
 
     Pistas:
@@ -54,9 +54,11 @@ def coral_loss(
     - salida: escalar
     """
 
-    raise NotImplementedError(
-        "TODO(alumno): implementar coral_loss() en src/tasks/ordinal_task.py."
-    )
+    levels = labels_to_levels(labels, num_classes)
+    losses = F.binary_cross_entropy_with_logits(logits, levels, reduction="none").sum(dim=1)
+    if class_weights is not None:
+        losses = losses * class_weights[labels]
+    return losses.mean()
 
 
 def effective_number_weights(
@@ -123,7 +125,7 @@ class CoralTask(ClassificationTask):
     Clasificacion ordinal con K-1 umbrales acumulativos.
 
     Ya entregado: la conexion con el Trainer y el calculo de pesos por fold.
-    Pendientes: perdida y pesos por clase.
+    Pendientes: pesos por numero efectivo.
 
     Formas:
         logits: (B, K-1)

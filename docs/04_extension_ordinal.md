@@ -2,7 +2,7 @@
 
 El experimento `conv1d_coral` reutiliza todo lo entregado (datos, tronco
 Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). Faltan
-la perdida y los pesos por clase; la cabeza, los niveles y la inferencia
+los pesos por clase; la perdida, la cabeza, los niveles y la inferencia
 ya estan implementados.
 
 ## Idea de CORAL
@@ -23,7 +23,7 @@ ya estan implementados.
 | 1 | `src/tasks/ordinal_task.py` | `labels_to_levels(labels, num_classes)` (implementada) | `(B,) -> (B, K-1)` |
 | 2 | `src/models/coral.py` | `CoralLayer(input_size, num_classes)` (implementada) | `(B, H) -> (B, K-1)` |
 | 3 | `src/models/coral.py` | `Conv1DCoralNet(...)` (implementada) | `(B, 15) -> (B, K-1)` |
-| 4 | `src/tasks/ordinal_task.py` | `coral_loss(logits, labels, num_classes, class_weights=None)` | escalar |
+| 4 | `src/tasks/ordinal_task.py` | `coral_loss(logits, labels, num_classes, class_weights=None)` (implementada) | escalar |
 | 5 | `src/tasks/ordinal_task.py` | `logits_to_ordinal_predictions(logits, threshold=0.5)` (implementada) | `(B, K-1) -> (B,)` |
 | 6 | `src/tasks/ordinal_task.py` | `effective_number_weights(labels, num_classes, beta=0.99)` | `(N,) -> (K,)` |
 

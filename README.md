@@ -29,7 +29,7 @@ estrategia de entrenamiento (`ClassificationTask`).
 - `Dataset` que entrega cada fila como tensor `(1, 15)` para `nn.Conv1d`.
 - Bloques `Conv1DBlock` (Conv1d + BatchNorm1d + ReLU), extractor convolucional,
   MLP y la red completa `Conv1DSoftmaxNet`.
-- Cabeza CORAL y red `Conv1DCoralNet`; falta implementar su perdida.
+- Cabeza CORAL, red `Conv1DCoralNet` y pérdida ordinal; faltan los pesos por clase.
 - Fabricas `ModelFactory` y `TaskFactory` para registrar algoritmos.
 - `Trainer` con Adam, `GridSearch` interna y `NestedCrossValidator` (5x3).
 - **Busqueda de hiperparametros en el loop interno**: recorre
@@ -42,7 +42,7 @@ estrategia de entrenamiento (`ClassificationTask`).
 
 ## Que queda como TODO (alumno)
 
-- `coral_loss` y `effective_number_weights` en `src/tasks/ordinal_task.py`.
+- `effective_number_weights` en `src/tasks/ordinal_task.py`.
 - Comparar `conv1d_softmax` y `conv1d_coral` (con y sin pesos) en los seis
   objetivos y completar el informe.
 
