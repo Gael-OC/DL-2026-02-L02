@@ -18,7 +18,7 @@ con `nn.Conv1d` antes del MLP.
 | Algoritmo | Arquitectura | Perdida | Prediccion | Estado |
 |---|---|---|---|---|
 | `conv1d_softmax` | Conv1D + MLP + `Linear(K)` | `CrossEntropyLoss` | `argmax` | Implementado |
-| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado; integración corta pendiente |
+| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado; integración corta comprobada |
 
 Ambos comparten el mismo tronco (`Conv1DBackbone`). Solo cambia la cabeza y la
 estrategia de entrenamiento (`ClassificationTask`).
@@ -42,7 +42,6 @@ estrategia de entrenamiento (`ClassificationTask`).
 
 ## Que queda como TODO (alumno)
 
-- Validar la integración corta de CORAL con y sin pesos.
 - Comparar `conv1d_softmax` y `conv1d_coral` (con y sin pesos) en los seis
   objetivos y completar el informe.
 

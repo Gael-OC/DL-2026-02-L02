@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3 y G2.4 terminadas. Reparto de trabajo
+**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4 y G2.5 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -53,7 +53,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | terminada | Cabeza y red implementadas; pruebas de formas, orden y gradientes aprobadas el 28/10 |
 | [x] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | terminada | BCE con logits, reducción y estabilidad comprobadas el 28/10 |
 | [x] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | terminada | Pesos por número efectivo y origen de conteos comprobados el 28/10 |
-| [ ] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | pendiente | — |
+| [x] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | terminada | Corridas cortas con y sin pesos y prueba de integración aprobadas el 28/10 |
 | [ ] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | pendiente | — |
 | [ ] | J2.2 Boosting | Johan | 31/10 | J1.2 | pendiente | — |
 | [ ] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | pendiente | — |
@@ -965,6 +965,11 @@ prueba corta no convierte un experimento final en terminado.
 | G2.2 | Gael | 28/10: cabeza CORAL y red conectadas; formas, orden antes/después de optimización y gradientes finitos comprobados para K=2,3,7; suite completa aprobada | G2.3 |
 | G2.3 | Gael | 28/10: pérdida BCE con logits, suma de umbrales y promedio del batch; equivalencia binaria, pesos unitarios y estabilidad comprobadas | G2.4 |
 | G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
+| G2.5 | Gael | 28/10: R2, una época y 2×2 folds, con y sin pesos; ambas corridas terminaron con métricas finitas; prueba de integración y suite completa aprobadas | G3 |
+
+Las salidas locales de G2.5 están en `results/g2_coral/` y
+`results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
+cortas, no resultados finales; los archivos de resultados no se versionan.
 
 ### Registro de arranque H0.2 — 25/10/2026
 

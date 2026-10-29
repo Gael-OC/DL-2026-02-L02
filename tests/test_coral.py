@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
-from src.config import TrainingConfig
+from src.config import ModelConfig, TrainingConfig
 from src.models.coral import CoralLayer, Conv1DCoralNet
 from src.tasks.ordinal_task import CoralTask, coral_loss, effective_number_weights, labels_to_levels, logits_to_ordinal_predictions
 from src.training.trainer import Trainer
@@ -111,6 +111,25 @@ class TestPesosCoral(unittest.TestCase):
                              (np.array([0]), 1.0)):
             with self.subTest(labels=labels, beta=beta), self.assertRaises(ValueError):
                 effective_number_weights(labels, 3, beta)
+
+
+class TestIntegracionCoral(unittest.TestCase):
+    def test_entrenamiento_y_prediccion_con_y_sin_pesos(self):
+        rng = np.random.default_rng(42)
+        X = rng.integers(0, 2, size=(12, 15)).astype(np.float32)
+        y = np.tile(np.arange(3), 4)
+        for weighted in (False, True):
+            with self.subTest(weighted=weighted):
+                trainer = Trainer.build(
+                    "conv1d_coral", ModelConfig(),
+                    TrainingConfig(epochs=1, batch_size=6, use_class_weights=weighted),
+                    num_features=15, num_classes=3, device=torch.device("cpu"), seed=42,
+                )
+                result = trainer.fit_and_evaluate(X[:9], y[:9], X[9:], y[9:], seed=42)
+                self.assertTrue(np.isfinite(result.final_train_loss))
+                self.assertTrue(all(np.isfinite(value) for value in result.metrics.values()))
+                self.assertEqual(result.y_pred.shape, (3,))
+                self.assertTrue(np.all((0 <= result.y_pred) & (result.y_pred < 3)))
 
 
 class TestNivelesEInferencia(unittest.TestCase):

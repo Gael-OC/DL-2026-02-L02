@@ -2,8 +2,8 @@
 
 El experimento `conv1d_coral` reutiliza todo lo entregado (datos, tronco
 Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). La perdida,
-los pesos por clase, la cabeza, los niveles y la inferencia ya estan implementados;
-queda pendiente la validacion de integracion corta.
+los pesos por clase, la cabeza, los niveles y la inferencia ya estan implementados.
+La integracion corta con y sin pesos fue comprobada en GDS_R2.
 
 ## Idea de CORAL
 
@@ -28,7 +28,7 @@ queda pendiente la validacion de integracion corta.
 | 6 | `src/tasks/ordinal_task.py` | `effective_number_weights(labels, num_classes, beta=0.99)` (implementada) | `(N,) -> (K,)` |
 
 `CoralTask`, `CoralLoss`, `ModelFactory` y `TaskFactory` **ya estan
-conectados**; queda comprobar las corridas cortas de `--algorithm conv1d_coral`.
+conectados** y se comprobaron con corridas cortas de `--algorithm conv1d_coral`.
 
 `Conv1DCoralNet` conecta el tronco compartido con la cabeza CORAL. El sesgo
 inicial y las diferencias positivas garantizan logits decrecientes.
