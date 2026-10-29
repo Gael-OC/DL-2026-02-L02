@@ -2,7 +2,7 @@
 
 El experimento `conv1d_coral` reutiliza todo lo entregado (datos, tronco
 Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). Faltan
-la cabeza CORAL, la perdida y los pesos por clase; los niveles y la inferencia
+la perdida y los pesos por clase; la cabeza, los niveles y la inferencia
 ya estan implementados.
 
 ## Idea de CORAL
@@ -21,8 +21,8 @@ ya estan implementados.
 | Orden | Archivo | Firma | Formas |
 |---|---|---|---|
 | 1 | `src/tasks/ordinal_task.py` | `labels_to_levels(labels, num_classes)` (implementada) | `(B,) -> (B, K-1)` |
-| 2 | `src/models/coral.py` | `CoralLayer(input_size, num_classes)` | `(B, H) -> (B, K-1)` |
-| 3 | `src/models/coral.py` | `Conv1DCoralNet(...)` | `(B, 15) -> (B, K-1)` |
+| 2 | `src/models/coral.py` | `CoralLayer(input_size, num_classes)` (implementada) | `(B, H) -> (B, K-1)` |
+| 3 | `src/models/coral.py` | `Conv1DCoralNet(...)` (implementada) | `(B, 15) -> (B, K-1)` |
 | 4 | `src/tasks/ordinal_task.py` | `coral_loss(logits, labels, num_classes, class_weights=None)` | escalar |
 | 5 | `src/tasks/ordinal_task.py` | `logits_to_ordinal_predictions(logits, threshold=0.5)` (implementada) | `(B, K-1) -> (B,)` |
 | 6 | `src/tasks/ordinal_task.py` | `effective_number_weights(labels, num_classes, beta=0.99)` | `(N,) -> (K,)` |
@@ -31,8 +31,8 @@ ya estan implementados.
 conectados**: al completar las funciones, `--algorithm conv1d_coral` funciona
 sin tocar `main.py` ni el `Trainer`.
 
-`Conv1DCoralNet` ya construye el tronco `self.backbone` (igual al de Softmax).
-Falta crear la cabeza CORAL sobre `self.backbone.output_dim` y el `forward`.
+`Conv1DCoralNet` conecta el tronco compartido con la cabeza CORAL. El sesgo
+inicial y las diferencias positivas garantizan logits decrecientes.
 
 ## Pistas
 

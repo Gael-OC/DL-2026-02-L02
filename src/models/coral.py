@@ -1,7 +1,6 @@
 """
 Experimento 2: Conv1D + MLP con cabeza ordinal CORAL.
 
-Este archivo contiene esqueletos que el alumno debe completar.
 El tronco Conv1D + MLP (Conv1DBackbone) ya esta implementado y es el mismo
 del experimento Softmax: solo cambia la cabeza de salida.
 """
@@ -10,13 +9,13 @@ from __future__ import annotations
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from src.models.blocks import Conv1DBackbone
 
 
 class CoralLayer(nn.Module):
     """
-    TODO(alumno):
     Capa de salida CORAL.
 
     Debe producir K-1 logits acumulativos a partir de un vector de
@@ -39,18 +38,19 @@ class CoralLayer(nn.Module):
         super().__init__()
         self.input_size = input_size
         self.num_classes = num_classes
-        # TODO(alumno): definir la proyeccion compartida y los parametros
-        # de los sesgos ordenados.
+        if num_classes < 2:
+            raise ValueError("CORAL requiere al menos dos clases")
+        self.score = nn.Linear(input_size, 1, bias=False)
+        self.bias = nn.Parameter(torch.zeros(1))
+        self.bias_steps = nn.Parameter(torch.zeros(num_classes - 2))
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError(
-            "TODO(alumno): implementar CoralLayer.forward() en src/models/coral.py."
-        )
+        offsets = torch.cat((self.bias.new_zeros(1), F.softplus(self.bias_steps).cumsum(dim=0)))
+        return self.score(inputs) + self.bias - offsets
 
 
 class Conv1DCoralNet(nn.Module):
     """
-    TODO(alumno):
     Conv1D + MLP con cabeza CORAL.
 
     Arquitectura sugerida:
@@ -79,9 +79,7 @@ class Conv1DCoralNet(nn.Module):
             hidden_dim=hidden_dim,
             dropout=dropout,
         )
-        # TODO(alumno): crear la cabeza CORAL sobre self.backbone.output_dim.
+        self.head = CoralLayer(self.backbone.output_dim, num_classes)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError(
-            "TODO(alumno): implementar Conv1DCoralNet.forward() en src/models/coral.py."
-        )
+        return self.head(self.backbone(inputs))

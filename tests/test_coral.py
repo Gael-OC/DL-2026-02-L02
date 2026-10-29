@@ -2,7 +2,45 @@ import unittest
 
 import torch
 
+from src.models.coral import CoralLayer, Conv1DCoralNet
 from src.tasks.ordinal_task import labels_to_levels, logits_to_ordinal_predictions
+
+
+class TestCabezaCoral(unittest.TestCase):
+    def test_cabeza_orden_y_gradientes_tras_optimizacion(self):
+        for k in (2, 3, 7):
+            with self.subTest(k=k):
+                layer = CoralLayer(5, k)
+                inputs = torch.randn(4, 5)
+                optimizer = torch.optim.SGD(layer.parameters(), lr=0.1)
+                for step in range(2):
+                    logits = layer(inputs)
+                    self.assertEqual(logits.shape, (4, k - 1))
+                    self.assertTrue(torch.all(logits[:, :-1] >= logits[:, 1:]))
+                    if step == 0:
+                        logits.square().mean().backward()
+                        for parameter in layer.parameters():
+                            self.assertIsNotNone(parameter.grad)
+                            self.assertTrue(torch.isfinite(parameter.grad).all())
+                        optimizer.step()
+
+    def test_red_acepta_ambas_formas(self):
+        for k in (2, 3, 7):
+            with self.subTest(k=k):
+                model = Conv1DCoralNet(num_features=15, num_classes=k).eval()
+                inputs = torch.randn(4, 15)
+                logits = model(inputs)
+                self.assertEqual(logits.shape, (4, k - 1))
+                torch.testing.assert_close(logits, model(inputs.unsqueeze(1)))
+                self.assertTrue(torch.all(logits[:, :-1] >= logits[:, 1:]))
+                logits.square().mean().backward()
+                for parameter in model.parameters():
+                    self.assertIsNotNone(parameter.grad)
+                    self.assertTrue(torch.isfinite(parameter.grad).all())
+
+    def test_requiere_dos_clases(self):
+        with self.assertRaises(ValueError):
+            CoralLayer(5, 1)
 
 
 class TestNivelesEInferencia(unittest.TestCase):

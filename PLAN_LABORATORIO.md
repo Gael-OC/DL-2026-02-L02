@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 27/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2 y G2.1 terminadas. Reparto de trabajo
+**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1 y G2.2 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -50,7 +50,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | J1.1 Constantes | Johan | 27/10 | H0.2, H0.3 | terminada | Implementado ConstantPredictor (moda con desempate a índice menor, mediana y distribución previa) y pruebas en tests/test_controles.py. |
 | [x] | J1.2 Controles logísticos | Johan | 27/10 | J1.1 | terminada | Implementado LogisticControlPredictor para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas. |
 | [x] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | terminada | Funciones y pruebas en `tests/test_coral.py`; suite completa aprobada el 27/10 |
-| [ ] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | pendiente | — |
+| [x] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | terminada | Cabeza y red implementadas; pruebas de formas, orden y gradientes aprobadas el 28/10 |
 | [ ] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | pendiente | — |
 | [ ] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | pendiente | — |
 | [ ] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | pendiente | — |
@@ -962,6 +962,7 @@ prueba corta no convierte un experimento final en terminado.
 | J1.1 | Johan | 27/10: Implementación de moda con desempate a índice menor, mediana y distribución previa + pruebas | J1.2 |
 | J1.2 | Johan | 27/10: Implementación para suma de bits y 15 entradas, barriendo las 4 candidatas de $C$ con selección MAE/QWK y pruebas aprobadas. | J2.1/J2.2/J2.3 |
 | G2.1 | Gael | 27/10: niveles acumulativos e inferencia implementados; pruebas para K=2,3,7 y umbrales aprobadas | G2.2 y G2.3 |
+| G2.2 | Gael | 28/10: cabeza CORAL y red conectadas; formas, orden antes/después de optimización y gradientes finitos comprobados para K=2,3,7; suite completa aprobada | G2.3 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 
