@@ -1,9 +1,13 @@
 import unittest
+from unittest.mock import patch
 
+import numpy as np
 import torch
 
+from src.config import TrainingConfig
 from src.models.coral import CoralLayer, Conv1DCoralNet
-from src.tasks.ordinal_task import coral_loss, labels_to_levels, logits_to_ordinal_predictions
+from src.tasks.ordinal_task import CoralTask, coral_loss, effective_number_weights, labels_to_levels, logits_to_ordinal_predictions
+from src.training.trainer import Trainer
 
 
 class TestCabezaCoral(unittest.TestCase):
@@ -74,6 +78,39 @@ class TestPerdidaCoral(unittest.TestCase):
         loss.backward()
         self.assertTrue(torch.isfinite(loss))
         self.assertTrue(torch.isfinite(logits.grad).all())
+
+
+class TestPesosCoral(unittest.TestCase):
+    def test_conteos_y_clases_ausentes(self):
+        torch.testing.assert_close(
+            effective_number_weights(np.array([0, 0, 1, 1, 2, 2]), 3), torch.ones(3)
+        )
+        weights = effective_number_weights(np.array([0, 0, 0, 1]), 3)
+        raw = np.array([(1 - 0.99) / (1 - 0.99 ** 3), 1.0, 0.0])
+        torch.testing.assert_close(weights, torch.tensor(raw / raw.mean(), dtype=torch.float32))
+        self.assertTrue(torch.isfinite(weights).all())
+        self.assertEqual(weights.shape, (3,))
+        self.assertAlmostEqual(weights.mean().item(), 1.0)
+
+    def test_conteos_solo_de_entrenamiento(self):
+        train_labels = np.array([0, 0, 1, 1])
+        eval_labels = np.array([2, 2])
+        trainer = Trainer(
+            Conv1DCoralNet(15, 3), CoralTask(3),
+            TrainingConfig(epochs=1, use_class_weights=True), torch.device("cpu")
+        )
+        with patch("src.tasks.ordinal_task.effective_number_weights", wraps=effective_number_weights) as calculate, \
+             patch.object(trainer, "train_one_epoch", return_value=0.0), \
+             patch.object(trainer, "evaluate", return_value=({}, np.zeros(2))):
+            trainer.fit_and_evaluate(np.zeros((4, 15)), train_labels, np.zeros((2, 15)), eval_labels, 42)
+        calculate.assert_called_once()
+        np.testing.assert_array_equal(calculate.call_args.args[0], train_labels)
+
+    def test_entrada_invalida(self):
+        for labels, beta in ((np.array([], dtype=int), 0.99), (np.array([3]), 0.99),
+                             (np.array([0]), 1.0)):
+            with self.subTest(labels=labels, beta=beta), self.assertRaises(ValueError):
+                effective_number_weights(labels, 3, beta)
 
 
 class TestNivelesEInferencia(unittest.TestCase):

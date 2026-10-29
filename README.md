@@ -18,7 +18,7 @@ con `nn.Conv1d` antes del MLP.
 | Algoritmo | Arquitectura | Perdida | Prediccion | Estado |
 |---|---|---|---|---|
 | `conv1d_softmax` | Conv1D + MLP + `Linear(K)` | `CrossEntropyLoss` | `argmax` | Implementado |
-| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | **TODO(alumno)** |
+| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado; integración corta pendiente |
 
 Ambos comparten el mismo tronco (`Conv1DBackbone`). Solo cambia la cabeza y la
 estrategia de entrenamiento (`ClassificationTask`).
@@ -29,7 +29,7 @@ estrategia de entrenamiento (`ClassificationTask`).
 - `Dataset` que entrega cada fila como tensor `(1, 15)` para `nn.Conv1d`.
 - Bloques `Conv1DBlock` (Conv1d + BatchNorm1d + ReLU), extractor convolucional,
   MLP y la red completa `Conv1DSoftmaxNet`.
-- Cabeza CORAL, red `Conv1DCoralNet` y pérdida ordinal; faltan los pesos por clase.
+- Cabeza CORAL, red `Conv1DCoralNet`, pérdida ordinal y pesos por número efectivo.
 - Fabricas `ModelFactory` y `TaskFactory` para registrar algoritmos.
 - `Trainer` con Adam, `GridSearch` interna y `NestedCrossValidator` (5x3).
 - **Busqueda de hiperparametros en el loop interno**: recorre
@@ -42,7 +42,7 @@ estrategia de entrenamiento (`ClassificationTask`).
 
 ## Que queda como TODO (alumno)
 
-- `effective_number_weights` en `src/tasks/ordinal_task.py`.
+- Validar la integración corta de CORAL con y sin pesos.
 - Comparar `conv1d_softmax` y `conv1d_coral` (con y sin pesos) en los seis
   objetivos y completar el informe.
 
@@ -78,8 +78,8 @@ DL-2026-02-L02/
 |   |-- utils.py             # semillas y dispositivo
 |   |-- experiment.py        # ExperimentRunner: algoritmos x objetivos
 |   |-- data/                # DataFrameLoader, TargetEncoder, StratifiedSplitter, Dataset (1, 15)
-|   |-- models/              # Conv1DBlock, Conv1DBackbone, Conv1DSoftmaxNet, CORAL (TODO), ModelFactory
-|   |-- tasks/               # ClassificationTask, SoftmaxTask, CoralTask (TODO), TaskFactory
+|   |-- models/              # Conv1DBlock, Conv1DBackbone, redes Softmax y CORAL, ModelFactory
+|   |-- tasks/               # ClassificationTask, SoftmaxTask, CoralTask, TaskFactory
 |   |-- training/            # Trainer, GridSearch, NestedCrossValidator
 |   |-- evaluation/          # MetricsCalculator
 |   `-- reporting/           # ReportWriter, rankings y graficos

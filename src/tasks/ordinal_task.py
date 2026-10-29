@@ -2,7 +2,6 @@
 Tarea ordinal CORAL.
 
 La clase CoralTask ya conecta la perdida y la prediccion con el Trainer.
-Quedan pendientes los pesos por numero efectivo.
 """
 
 from __future__ import annotations
@@ -67,7 +66,6 @@ def effective_number_weights(
     beta: float = 0.99,
 ) -> torch.Tensor:
     """
-    TODO(alumno):
     Pesos por numero efectivo de muestras (Cui et al., CVPR 2019):
 
         w_c = (1 - beta) / (1 - beta ** n_c)
@@ -80,9 +78,19 @@ def effective_number_weights(
     - salida: (num_classes,) float32
     """
 
-    raise NotImplementedError(
-        "TODO(alumno): implementar effective_number_weights() en src/tasks/ordinal_task.py."
-    )
+    if not 0.0 < beta < 1.0:
+        raise ValueError("beta debe estar en (0, 1).")
+    labels = np.asarray(labels)
+    if labels.ndim != 1 or labels.size == 0 or not np.issubdtype(labels.dtype, np.integer):
+        raise ValueError("labels debe ser un vector no vacio de enteros.")
+    if num_classes < 2 or np.any(labels < 0) or np.any(labels >= num_classes):
+        raise ValueError("labels debe contener clases entre 0 y num_classes - 1.")
+    counts = np.bincount(labels, minlength=num_classes)
+    weights = np.zeros(num_classes, dtype=np.float64)
+    present = counts > 0
+    weights[present] = (1 - beta) / -np.expm1(counts[present] * np.log(beta))
+    weights /= weights.mean()
+    return torch.tensor(weights, dtype=torch.float32)
 
 
 @torch.no_grad()
@@ -125,7 +133,6 @@ class CoralTask(ClassificationTask):
     Clasificacion ordinal con K-1 umbrales acumulativos.
 
     Ya entregado: la conexion con el Trainer y el calculo de pesos por fold.
-    Pendientes: pesos por numero efectivo.
 
     Formas:
         logits: (B, K-1)

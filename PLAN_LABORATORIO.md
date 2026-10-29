@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2 y G2.3 terminadas. Reparto de trabajo
+**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3 y G2.4 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -52,7 +52,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.1 Niveles e inferencia | Gael | 29/10 | G1.1 | terminada | Funciones y pruebas en `tests/test_coral.py`; suite completa aprobada el 27/10 |
 | [x] | G2.2 Cabeza CORAL | Gael | 29/10 | G1.2 | terminada | Cabeza y red implementadas; pruebas de formas, orden y gradientes aprobadas el 28/10 |
 | [x] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | terminada | BCE con logits, reducción y estabilidad comprobadas el 28/10 |
-| [ ] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | pendiente | — |
+| [x] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | terminada | Pesos por número efectivo y origen de conteos comprobados el 28/10 |
 | [ ] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | pendiente | — |
 | [ ] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | pendiente | — |
 | [ ] | J2.2 Boosting | Johan | 31/10 | J1.2 | pendiente | — |
@@ -964,6 +964,7 @@ prueba corta no convierte un experimento final en terminado.
 | G2.1 | Gael | 27/10: niveles acumulativos e inferencia implementados; pruebas para K=2,3,7 y umbrales aprobadas | G2.2 y G2.3 |
 | G2.2 | Gael | 28/10: cabeza CORAL y red conectadas; formas, orden antes/después de optimización y gradientes finitos comprobados para K=2,3,7; suite completa aprobada | G2.3 |
 | G2.3 | Gael | 28/10: pérdida BCE con logits, suma de umbrales y promedio del batch; equivalencia binaria, pesos unitarios y estabilidad comprobadas | G2.4 |
+| G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
 
 ### Registro de arranque H0.2 — 25/10/2026
 
