@@ -70,6 +70,7 @@ class ExperimentRunner:
         self.loader = loader or DataFrameLoader()
         self.device = resolve_device(config.device)
         self.console = ConsoleReporter()
+        self.records = None
 
     def _grid_for(self, algorithm: str) -> list[dict] | None:
         if not self.config.validation.use_grid:
@@ -94,11 +95,24 @@ class ExperimentRunner:
             split_seed=self.config.split_seed,
             init_seed=self.config.init_seed,
             split_path=self.config.output_dir / target_name / "splits.npz",
+            records=self.records,
             device=self.device,
         )
         return validator.run(data)
 
     def run(self) -> list[ExperimentResult]:
+        """Ejecuta o retoma una corrida si coincide el manifiesto."""
+        from src.training.records import RunRecords, make_manifest
+        self.records = RunRecords(self.config.output_dir, make_manifest(self.config, self.device))
+        try:
+            results = self._run()
+            self.records.status('terminado' if results else 'fallido')
+            return results
+        except BaseException as error:
+            self.records.status('fallido', f'{type(error).__name__}: {error}')
+            raise
+
+    def _run(self) -> list[ExperimentResult]:
         """Ejecuta todos los experimentos y escribe los reportes."""
 
         dataframe = self.loader.load(self.config.data_path)
@@ -112,8 +126,7 @@ class ExperimentRunner:
                     result = self.run_one(dataframe, algorithm, target_name)
                 except NotImplementedError as error:
                     print(f"Se omite {algorithm}: {error}")
-                    pending_algorithms.append((algorithm, str(error)))
-                    break
+                    raise RuntimeError(f"Fallo {algorithm}: {error}") from error
                 self.console.experiment(result)
                 results.append(result)
 
@@ -121,6 +134,8 @@ class ExperimentRunner:
             print("\nNo hay resultados para reportar.")
             return results
 
+        from experimentos.reportes import regenerate_reports
+        regenerate_reports(self.config.output_dir)
         self.console.rankings(results, self.config.rank_metric, self.config.rank_mode)
         paths = ReportWriter(self.config.output_dir).save(
             results,

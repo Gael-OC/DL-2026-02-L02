@@ -27,6 +27,9 @@ class OuterFoldResult:
     y_true: np.ndarray
     y_pred: np.ndarray
     final_train_loss: float
+    row_ids: np.ndarray | None = None
+    logits: np.ndarray | None = None
+    probabilities: np.ndarray | None = None
 
 
 @dataclass
@@ -100,6 +103,7 @@ class NestedCrossValidator:
         split_seed: int | None = None,
         init_seed: int | None = None,
         split_path=None,
+        records=None,
     ) -> None:
         self.algorithm = algorithm
         self.base_model_config = base_model_config
@@ -111,6 +115,7 @@ class NestedCrossValidator:
         self.split_seed = seed if split_seed is None else split_seed
         self.init_seed = seed if init_seed is None else init_seed
         self.split_path = split_path
+        self.records = records
         self.device = device
         self.verbose = verbose
 
@@ -170,6 +175,14 @@ class NestedCrossValidator:
         )
 
         for outer_index, (train_idx, test_idx) in enumerate(outer_splits, start=1):
+            variant = ("coral_weighted" if self.algorithm == "conv1d_coral" and self.base_training_config.use_class_weights
+                       else "coral" if self.algorithm == "conv1d_coral" else "softmax")
+            if self.records is not None:
+                saved = self.records.load_fold(data.target_name, variant, outer_index)
+                if saved is not None:
+                    result.folds.append(saved)
+                    continue
+            context = {'target': data.target_name, 'variant': variant, 'outer_fold': outer_index}
             X_train, y_train = X[train_idx], y[train_idx]
             X_test, y_test = X[test_idx], y[test_idx]
 
@@ -181,6 +194,8 @@ class NestedCrossValidator:
                 init_seed=self.init_seed + outer_index * 100,
                 splits=inner_splits[outer_index - 1],
                 skip=not inner_splits[outer_index - 1],
+                records=self.records,
+                context=context,
             )
             if search_result.skipped:
                 if data.target_name == "GDS":
@@ -203,7 +218,19 @@ class NestedCrossValidator:
                 device=self.device,
                 seed=final_seed,
             )
-            fit = trainer.fit_and_evaluate(X_train, y_train, X_test, y_test, final_seed)
+            if self.records is None:
+                fit = trainer.fit_and_evaluate(X_train, y_train, X_test, y_test, final_seed)
+            else:
+                from src.training.records import recorded_fit
+                fit = recorded_fit(self.records, trainer, X_train, y_train, X_test, y_test, final_seed,
+                                   {**context, 'phase': 'refit', 'candidate': None})
+            logits = probabilities = None
+            if self.records is not None:
+                logits = trainer.predict_logits(X_test)
+                with torch.no_grad():
+                    probabilities = trainer.task.probabilities(torch.from_numpy(logits).to(self.device)).cpu().numpy()
+                fit.metrics['nll'] = MetricsCalculator.nll(y_test, probabilities)
+                fit.metrics['rps'] = MetricsCalculator.rps(y_test, probabilities)
             result.folds.append(
                 OuterFoldResult(
                     outer_fold=outer_index,
@@ -213,8 +240,13 @@ class NestedCrossValidator:
                     y_true=fit.y_true,
                     y_pred=fit.y_pred,
                     final_train_loss=fit.final_train_loss,
+                    row_ids=test_idx if self.records is not None else None,
+                    logits=logits, probabilities=probabilities,
                 )
             )
+
+            if self.records is not None:
+                self.records.save_fold(data.target_name, variant, outer_index, result.folds[-1], search_result.candidate_records)
 
             if self.verbose:
                 print(

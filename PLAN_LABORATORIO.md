@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, G3.1, G3.2 y G3.3 terminadas. Reparto de trabajo
+**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, G3.1, G3.2, G3.3, G3.4 y G3.5 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -60,8 +60,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | terminada | Alfabeto completo, QWK no estimable, NLL/RPS y pruebas; corrida corta Softmax/R2 verificada |
 | [x] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | terminada | Índices globales persistidos, semillas separadas, GDS sin búsqueda interna y pruebas aprobadas |
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
-| [ ] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | pendiente | — |
-| [ ] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | pendiente | — |
+| [x] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | terminada | Manifiesto, ajustes, candidatas y folds recuperables; interrupción y reanudación verificadas |
+| [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
 | [ ] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | pendiente | — |
 | [ ] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | pendiente | — |
 | [ ] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | pendiente | — |
@@ -969,6 +969,8 @@ prueba corta no convierte un experimento final en terminado.
 | G3.1 | Gael | 31/10: alfabeto completo, QWK no estimable, NLL/RPS y convenciones documentadas; 27 pruebas y corrida corta Softmax/R2 de 1 época y 2×2 folds aprobadas | G3.2 y G3.3; conectar NLL/RPS a probabilidades en G3.3 |
 | G3.2 | Gael | 31/10: splits globales compatibles con protocolo de controles, semillas separadas y omisión interna de GDS; 30 pruebas y corrida corta R2 aprobadas | G3.3 y G3.4 |
 | G3.3 | Gael | 31/10: logits y probabilidades Softmax/CORAL, validación de acumulativas y decisiones originales; 33 pruebas aprobadas | G3.4 y G3.5 |
+| G3.4 | Gael | 31/10: manifiesto, ajustes, selección y checkpoints por fold; interrupción simulada y reanudación comprobadas, 34 pruebas y corrida corta R2 aprobadas | G3.5 |
+| G3.5 | Gael | 31/10: predicciones OOF, métricas, confusiones y regeneración sin entrenamiento; 35 pruebas y corrida corta R2 comprobadas | G4.1 |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas

@@ -41,6 +41,7 @@ class SearchResult:
     best: CandidateScore
     candidates: list[CandidateScore] = field(default_factory=list)
     skipped: bool = False
+    candidate_records: list[dict] = field(default_factory=list)
 
 
 class GridSearch:
@@ -90,20 +91,29 @@ class GridSearch:
         init_seed: int | None = None,
         splits=None,
         skip: bool = False,
+        records=None,
+        context=None,
     ) -> SearchResult:
         """Evalua cada candidata y devuelve la ganadora."""
 
         splitter = StratifiedSplitter(self.inner_folds, random_state=seed)
         if skip or not splitter.can_split(y):
             # Clase demasiado rara: se usa la configuracion base sin buscar.
-            return SearchResult(best=self._candidate({}), skipped=True)
+            from dataclasses import asdict
+            import json
+            best = self._candidate({})
+            row = {'candidata': 0, 'configuracion': json.dumps({'model': asdict(best.model_config), 'training': asdict(best.training_config)}),
+                   'resultados_internos': '[]', 'mae_mean': float('nan'), 'mae_std': float('nan'),
+                   'qwk_mean': float('nan'), 'qwk_std': float('nan'), 'seleccionada': True}
+            return SearchResult(best=best, skipped=True, candidate_records=[row])
 
         splits = splitter.split(y) if splits is None else splits
         init_seed = seed if init_seed is None else init_seed
         scores = []
-        for overrides in self.candidates:
+        candidate_records = []
+        for candidate_index, overrides in enumerate(self.candidates, start=1):
             candidate = self._candidate(overrides)
-            mae_values, qwk_values = [], []
+            mae_values, qwk_values, internal_results = [], [], []
             for fold_index, (train_idx, val_idx) in enumerate(splits):
                 run_seed = init_seed + fold_index
                 trainer = Trainer.build(
@@ -115,9 +125,13 @@ class GridSearch:
                     device=self.device,
                     seed=run_seed,
                 )
-                result = trainer.fit_and_evaluate(
-                    X[train_idx], y[train_idx], X[val_idx], y[val_idx], seed=run_seed
-                )
+                if records is None:
+                    result = trainer.fit_and_evaluate(X[train_idx], y[train_idx], X[val_idx], y[val_idx], seed=run_seed)
+                else:
+                    from src.training.records import recorded_fit
+                    result = recorded_fit(records, trainer, X[train_idx], y[train_idx], X[val_idx], y[val_idx], run_seed,
+                                          {**context, 'phase': 'inner', 'candidate': candidate_index, 'inner_fold': fold_index + 1})
+                internal_results.append(result.metrics)
                 mae_values.append(result.metrics["mae_ordinal"])
                 qwk_values.append(result.metrics["qwk"])
 
@@ -126,6 +140,14 @@ class GridSearch:
             candidate.qwk_mean = float(np.mean(qwk_values))
             candidate.qwk_std = float(np.std(qwk_values))
             scores.append(candidate)
+            from dataclasses import asdict
+            import json
+            candidate_records.append({'candidata': candidate_index,
+                'configuracion': json.dumps({'model': asdict(candidate.model_config), 'training': asdict(candidate.training_config)}),
+                'resultados_internos': json.dumps(internal_results), 'mae_mean': candidate.mae_mean,
+                'mae_std': candidate.mae_std, 'qwk_mean': candidate.qwk_mean, 'qwk_std': candidate.qwk_std,
+                'seleccionada': False})
 
         best = min(scores, key=CandidateScore.selection_key)
-        return SearchResult(best=best, candidates=scores)
+        candidate_records[scores.index(best)]["seleccionada"] = True
+        return SearchResult(best=best, candidates=scores, candidate_records=candidate_records)

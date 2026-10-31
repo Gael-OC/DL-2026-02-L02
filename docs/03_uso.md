@@ -147,7 +147,18 @@ Cada objetivo guarda `<output-dir>/<objetivo>/splits.npz`: `outer_N_train`,
 archivo existente coincida antes de reutilizar la carpeta. Las redes usan esas
 mismas particiones; para compararlas con los controles de R2 usar 5×3 y
 `--split-seed 42`. En GDS se omite siempre la búsqueda interna por protocolo.
-El manifiesto completo y la reanudación de corridas corresponden a G3.4.
+Cada corrida nueva necesita una carpeta vacía. `manifest.json` guarda la
+configuración, hashes de datos y código, versiones, dispositivo, semillas y
+estado. Al repetir el mismo comando se recuperan los folds completados; si el
+manifiesto no coincide se rechaza la reanudación. Se vuelve a ejecutar el fold
+incompleto. `ajustes.jsonl` conserva cada intento, incluso los fallidos o
+repetidos tras una interrupción; `candidatas.csv` y `metricas_folds.csv` se
+regeneran desde los folds completos. Los archivos contienen datos individuales y
+permanecen fuera de Git. Cada variante guarda `predicciones_oof.csv`, `confusion_oof.csv` y
+`reporte.json` en `<objetivo>/<variante>/`. El reporte separa las métricas de
+cada fold del agregado OOF, incluye NLL y RPS, soportes y omisiones de búsqueda.
+Para regenerarlos sin entrenar, ejecutar `python -m experimentos.reportes CARPETA`.
+Las predicciones actuales corresponden a la repetición 1.
 
 ## Convenciones de métricas
 
@@ -163,9 +174,8 @@ media y desviación (`ddof=0`) sobre ellos y conservan `NaN` si no hay ninguno.
 solo protege el logaritmo con el menor positivo representable del tipo de la
 matriz. `MetricsCalculator.rps(y, probabilidades)` calcula RPS medio normalizado
 por K−1. Ambas funciones exigen una matriz válida (N, K). Las redes exponen `Trainer.predict_logits(X)`, `predict_proba(X)` y la decisión
-original con `predict(X)`. Las métricas se pueden calcular con esas
-probabilidades; su exportación y reporte automático corresponden a G3.5, por
-lo que aún no aparecen en las corridas de la CLI.
+original con `predict(X)`. Las métricas NLL y RPS se incluyen en `metricas_folds.csv` y en los
+reportes regenerables de cada variante.
 
 ## Salidas en `results/`
 
