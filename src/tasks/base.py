@@ -46,5 +46,9 @@ class ClassificationTask(ABC):
         """
 
     @abstractmethod
+    def probabilities(self, logits: torch.Tensor) -> torch.Tensor:
+        """Devuelve probabilidades de clase (B,K)."""
+
+    @abstractmethod
     def predict(self, logits: torch.Tensor) -> torch.Tensor:
         """Convierte logits en clases enteras (B,) en 0 .. K-1."""

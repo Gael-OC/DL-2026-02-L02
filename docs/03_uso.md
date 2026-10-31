@@ -72,7 +72,9 @@ Todos los comandos se ejecutan desde la raiz del repositorio.
 
 | Argumento | Defecto | Descripcion |
 |---|---|---|
-| `--seed` | `42` | Semilla |
+| `--seed` | `42` | Semilla de referencia para particion y entrenamiento |
+| `--split-seed` | `--seed` | Semilla de particion externa; internas usan semilla + 100 × fold externo |
+| `--init-seed` | `--seed` | Semilla de entrenamiento; iguales folds internos usan la misma semilla entre candidatas |
 | `--device` | `cpu` | `cpu`, `cuda` o `auto` |
 | `--output-dir` | `results` | Carpeta de CSV, Markdown y PNG |
 | `--rank-metric` | `f1_macro` | Metrica del ranking generico |
@@ -137,6 +139,33 @@ Por cada experimento:
 
 Al final: rankings por F1, por MAE y por `--rank-metric`, y la lista de
 archivos generados.
+
+Cada objetivo guarda `<output-dir>/<objetivo>/splits.npz`: `outer_N_train`,
+`outer_N_test`, `outer_N_inner_M_train` y `outer_N_inner_M_val` contienen
+índices globales de fila, con folds numerados desde 1. Incluye `split_seed`,
+`target`, `labels`, `classes` e `outer_N_inner_skipped`. Se comprueba que un
+archivo existente coincida antes de reutilizar la carpeta. Las redes usan esas
+mismas particiones; para compararlas con los controles de R2 usar 5×3 y
+`--split-seed 42`. En GDS se omite siempre la búsqueda interna por protocolo.
+El manifiesto completo y la reanudación de corridas corresponden a G3.4.
+
+## Convenciones de métricas
+
+Las métricas macro y la QWK usan las K clases del objetivo, incluso si una clase
+no aparece en un fold; una clase sin definición aporta cero a las macro. La
+balanced accuracy promedia recall solo sobre clases con soporte real. El reporte
+por clase indica el soporte y la confusión del último fold usa etiquetas originales.
+Si el desacuerdo esperado de QWK es cero, se informa `NaN` y la causa en
+`seleccion_hp.csv`. Los resúmenes muestran cuántos folds son válidos, calculan
+media y desviación (`ddof=0`) sobre ellos y conservan `NaN` si no hay ninguno.
+
+`MetricsCalculator.nll(y, probabilidades)` calcula la pérdida logarítmica media;
+solo protege el logaritmo con el menor positivo representable del tipo de la
+matriz. `MetricsCalculator.rps(y, probabilidades)` calcula RPS medio normalizado
+por K−1. Ambas funciones exigen una matriz válida (N, K). Las redes exponen `Trainer.predict_logits(X)`, `predict_proba(X)` y la decisión
+original con `predict(X)`. Las métricas se pueden calcular con esas
+probabilidades; su exportación y reporte automático corresponden a G3.5, por
+lo que aún no aparecen en las corridas de la CLI.
 
 ## Salidas en `results/`
 

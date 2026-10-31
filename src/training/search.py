@@ -87,21 +87,25 @@ class GridSearch:
         y: np.ndarray,
         num_classes: int,
         seed: int,
+        init_seed: int | None = None,
+        splits=None,
+        skip: bool = False,
     ) -> SearchResult:
         """Evalua cada candidata y devuelve la ganadora."""
 
         splitter = StratifiedSplitter(self.inner_folds, random_state=seed)
-        if not splitter.can_split(y):
+        if skip or not splitter.can_split(y):
             # Clase demasiado rara: se usa la configuracion base sin buscar.
             return SearchResult(best=self._candidate({}), skipped=True)
 
-        splits = splitter.split(y)
+        splits = splitter.split(y) if splits is None else splits
+        init_seed = seed if init_seed is None else init_seed
         scores = []
-        for candidate_index, overrides in enumerate(self.candidates):
+        for overrides in self.candidates:
             candidate = self._candidate(overrides)
             mae_values, qwk_values = [], []
             for fold_index, (train_idx, val_idx) in enumerate(splits):
-                run_seed = seed + candidate_index * 10 + fold_index
+                run_seed = init_seed + fold_index
                 trainer = Trainer.build(
                     self.algorithm,
                     candidate.model_config,

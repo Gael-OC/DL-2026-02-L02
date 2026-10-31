@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 28/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4 y G2.5 terminadas. Reparto de trabajo
+**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, G3.1, G3.2 y G3.3 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -57,9 +57,9 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [ ] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | pendiente | — |
 | [ ] | J2.2 Boosting | Johan | 31/10 | J1.2 | pendiente | — |
 | [ ] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | pendiente | — |
-| [ ] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | pendiente | — |
-| [ ] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | pendiente | — |
-| [ ] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | pendiente | — |
+| [x] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | terminada | Alfabeto completo, QWK no estimable, NLL/RPS y pruebas; corrida corta Softmax/R2 verificada |
+| [x] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | terminada | Índices globales persistidos, semillas separadas, GDS sin búsqueda interna y pruebas aprobadas |
+| [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
 | [ ] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | pendiente | — |
 | [ ] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | pendiente | — |
 | [ ] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | pendiente | — |
@@ -966,6 +966,9 @@ prueba corta no convierte un experimento final en terminado.
 | G2.3 | Gael | 28/10: pérdida BCE con logits, suma de umbrales y promedio del batch; equivalencia binaria, pesos unitarios y estabilidad comprobadas | G2.4 |
 | G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
 | G2.5 | Gael | 28/10: R2, una época y 2×2 folds, con y sin pesos; ambas corridas terminaron con métricas finitas; prueba de integración y suite completa aprobadas | G3 |
+| G3.1 | Gael | 31/10: alfabeto completo, QWK no estimable, NLL/RPS y convenciones documentadas; 27 pruebas y corrida corta Softmax/R2 de 1 época y 2×2 folds aprobadas | G3.2 y G3.3; conectar NLL/RPS a probabilidades en G3.3 |
+| G3.2 | Gael | 31/10: splits globales compatibles con protocolo de controles, semillas separadas y omisión interna de GDS; 30 pruebas y corrida corta R2 aprobadas | G3.3 y G3.4 |
+| G3.3 | Gael | 31/10: logits y probabilidades Softmax/CORAL, validación de acumulativas y decisiones originales; 33 pruebas aprobadas | G3.4 y G3.5 |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas

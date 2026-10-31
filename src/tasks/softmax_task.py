@@ -29,6 +29,11 @@ class SoftmaxTask(ClassificationTask):
     ) -> LossFunction:
         return nn.CrossEntropyLoss()
 
+    def probabilities(self, logits: torch.Tensor) -> torch.Tensor:
+        if logits.ndim != 2 or logits.shape[1] != self.num_classes or not torch.isfinite(logits).all():
+            raise ValueError("Se requieren logits finitos con forma (B,K).")
+        return torch.softmax(logits, dim=1)
+
     @torch.no_grad()
     def predict(self, logits: torch.Tensor) -> torch.Tensor:
         return logits.argmax(dim=1)

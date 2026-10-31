@@ -48,6 +48,7 @@ CSV_FIELDS = [
     *CONFIG_FIELDS,
     *METRIC_KEYS,
     *[f"{key}_std" for key in METRIC_KEYS],
+    *[f"{key}_valid" for key in METRIC_KEYS],
 ]
 
 SELECTION_FIELDS = [
@@ -66,6 +67,8 @@ SELECTION_FIELDS = [
     "inner_qwk",
     "test_f1_macro",
     "test_mae_ordinal",
+    "test_qwk",
+    "qwk_no_estimable",
 ]
 
 
@@ -90,13 +93,16 @@ class Ranking:
     def rank(rows: list[dict], metric: str, mode: str) -> list[dict]:
         if metric not in METRIC_KEYS:
             raise ValueError(f"Metrica invalida: {metric}. Use una de {METRIC_KEYS}.")
-        return sorted(rows, key=lambda row: row[metric], reverse=(mode == "max"))
+        return sorted(rows, key=lambda row: (
+            not np.isfinite(row[metric]),
+            -row[metric] if mode == "max" else row[metric],
+        ))
 
     @staticmethod
     def format_console(ranked_rows: list[dict], metric: str, mode: str) -> str:
         lines = [f"Ranking {DISPLAY_NAMES.get(metric, metric)} ({mode}):"]
         for index, row in enumerate(ranked_rows, start=1):
-            marker = " <- mejor" if index == 1 else ""
+            marker = " <- mejor" if index == 1 and np.isfinite(row[metric]) else ""
             lines.append(
                 f"  {index}. {row['algorithm']} / {row['target']}: "
                 f"{row[metric]:.4f} ± {row[f'{metric}_std']:.4f}{marker}"
@@ -137,6 +143,7 @@ class ResultRows:
         for metric in METRIC_KEYS:
             row[metric] = result.summary[f"mean_{metric}"]
             row[f"{metric}_std"] = result.summary[f"std_{metric}"]
+            row[f"{metric}_valid"] = result.summary[f"valid_{metric}"]
         return row
 
     @staticmethod
@@ -164,6 +171,9 @@ class ResultRows:
                     "inner_qwk": fold.selected.qwk_mean,
                     "test_f1_macro": fold.metrics["f1_macro"],
                     "test_mae_ordinal": fold.metrics["mae_ordinal"],
+                    "test_qwk": fold.metrics["qwk"],
+                    "qwk_no_estimable": ("desacuerdo esperado igual a cero"
+                                          if np.isnan(fold.metrics["qwk"]) else ""),
                 }
             )
         return rows
@@ -182,7 +192,8 @@ class MarkdownTables:
             DISPLAY_NAMES[key] for key in METRIC_KEYS
         ]
         lines = [
-            "# Resultados (media ± std de los folds externos)\n",
+            "# Resultados (media ± std de los folds externos; validos/total)\n",
+            "QWK no estimable: desacuerdo esperado igual a cero; se excluye del promedio y se cuenta abajo.\n",
             "| " + " | ".join(headers) + " |",
             "| " + " | ".join(["---"] * len(headers)) + " |",
         ]
@@ -194,7 +205,7 @@ class MarkdownTables:
                 str(row["conv_channels"]),
                 str(row["kernel_size"]),
             ]
-            cells += [cls._mean_std(row[k], row[f"{k}_std"]) for k in METRIC_KEYS]
+            cells += [f"{cls._mean_std(row[k], row[f'{k}_std'])} ({row[f'{k}_valid']}/{row['outer_folds']})" for k in METRIC_KEYS]
             lines.append("| " + " | ".join(cells) + " |")
         return "\n".join(lines) + "\n"
 
@@ -211,7 +222,7 @@ class MarkdownTables:
         for index, row in enumerate(ranked_rows, start=1):
             algorithm, target = row["algorithm"], row["target"]
             metric_cell = cls._mean_std(row[metric], row[f"{metric}_std"])
-            if index == 1:
+            if index == 1 and np.isfinite(row[metric]):
                 algorithm, target = f"**{algorithm}**", f"**{target}**"
                 metric_cell = f"**{metric_cell}**"
             cells = [
@@ -226,7 +237,7 @@ class MarkdownTables:
                 f"{row['errores_graves']:.4f}",
             ]
             lines.append("| " + " | ".join(cells) + " |")
-        if ranked_rows:
+        if ranked_rows and np.isfinite(ranked_rows[0][metric]):
             best = ranked_rows[0]
             lines.append("")
             lines.append(
@@ -277,7 +288,7 @@ class Plotter:
         labels = [f"{row['algorithm']} / {row['target']}" for row in ranked_rows]
         values = [row[metric] for row in ranked_rows]
         figure, axis = plt.subplots(figsize=(8, max(3.0, 0.45 * len(ranked_rows) + 1.2)))
-        colors = ["#B51700" if i == 0 else "#0076BA" for i in range(len(values))]
+        colors = ["#B51700" if i == 0 and np.isfinite(v) else "#0076BA" for i, v in enumerate(values)]
         axis.barh(range(len(values)), values, color=colors)
         axis.set_yticks(range(len(labels)))
         axis.set_yticklabels(labels)
@@ -289,10 +300,13 @@ class Plotter:
         cls._save(figure, output_path)
 
     @classmethod
-    def confusion_matrix(cls, matrix: np.ndarray, title: str, output_path: Path) -> None:
+    def confusion_matrix(cls, matrix: np.ndarray, title: str, output_path: Path, class_names=None) -> None:
         figure, axis = plt.subplots(figsize=(4.8, 4.2))
         image = axis.imshow(matrix, cmap="Blues")
         figure.colorbar(image, ax=axis, fraction=0.046, pad=0.04)
+        if class_names is not None:
+            axis.set_xticks(range(len(class_names)), [str(x) for x in class_names])
+            axis.set_yticks(range(len(class_names)), [str(x) for x in class_names])
         axis.set_xlabel("Predicho")
         axis.set_ylabel("Real")
         axis.set_title(title)
@@ -385,6 +399,7 @@ class ReportWriter:
                 np.asarray(result.last_fold_confusion()),
                 f"{result.algorithm} / {result.target_name}",
                 path,
+                class_names=result.classes,
             )
             paths[key] = path
         return paths

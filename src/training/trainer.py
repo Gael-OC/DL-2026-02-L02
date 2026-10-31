@@ -124,22 +124,33 @@ class Trainer:
         ]
 
     @torch.no_grad()
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predice clases enteras (N,) para X (N, 15)."""
-
+    def predict_logits(self, X: np.ndarray) -> np.ndarray:
+        """Devuelve logits en orden de entrada: (N,K) o (N,K-1)."""
         self.model.eval()
         loader = self._make_loader(X, np.zeros(len(X), dtype=np.int64), False, 0)
-        predictions = []
-        for inputs, _ in loader:
-            logits = self.model(inputs.to(self.device))
-            predictions.append(self.task.predict(logits).cpu().numpy())
-        return np.concatenate(predictions)
+        batches = [self.model(inputs.to(self.device)).cpu().numpy() for inputs, _ in loader]
+        if not batches:
+            width = self.task.num_classes - (self.task.name == "coral")
+            return np.empty((0, width), dtype=np.float32)
+        return np.concatenate(batches)
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Devuelve probabilidades de clase (N,K)."""
+        logits = torch.from_numpy(self.predict_logits(X)).to(self.device)
+        with torch.no_grad():
+            return self.task.probabilities(logits).cpu().numpy()
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Conserva la regla original de decision de cada tarea."""
+        logits = torch.from_numpy(self.predict_logits(X)).to(self.device)
+        with torch.no_grad():
+            return self.task.predict(logits).cpu().numpy()
 
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> tuple[dict[str, float], np.ndarray]:
         """Devuelve (metricas, y_pred)."""
 
         y_pred = self.predict(X)
-        return MetricsCalculator.compute(y, y_pred), y_pred
+        return MetricsCalculator.compute(y, y_pred, self.task.num_classes), y_pred
 
     def fit_and_evaluate(
         self,

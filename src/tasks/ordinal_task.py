@@ -154,5 +154,14 @@ class CoralTask(ClassificationTask):
             ).to(device)
         return CoralLoss(self.num_classes, class_weights)
 
+    def probabilities(self, logits: torch.Tensor) -> torch.Tensor:
+        if logits.ndim != 2 or logits.shape[1] != self.num_classes - 1 or not torch.isfinite(logits).all():
+            raise ValueError("Se requieren logits finitos con forma (B,K-1).")
+        if torch.any(logits[:, 1:] > logits[:, :-1]):
+            raise ValueError("Las probabilidades acumulativas CORAL deben ser decrecientes.")
+        cumulative = torch.sigmoid(logits)
+        return torch.cat((1 - cumulative[:, :1], cumulative[:, :-1] - cumulative[:, 1:],
+                          cumulative[:, -1:]), dim=1)
+
     def predict(self, logits: torch.Tensor) -> torch.Tensor:
         return logits_to_ordinal_predictions(logits)

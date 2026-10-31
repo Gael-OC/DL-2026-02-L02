@@ -217,6 +217,8 @@ class ExperimentConfig:
     training: TrainingConfig = field(default_factory=TrainingConfig)
     validation: ValidationConfig = field(default_factory=ValidationConfig)
     seed: int = DEFAULT_RANDOM_SEED
+    split_seed: int | None = None
+    init_seed: int | None = None
     device: str = "cpu"
     output_dir: Path = Path(DEFAULT_OUTPUT_DIR)
     rank_metric: str = DEFAULT_RANK_METRIC

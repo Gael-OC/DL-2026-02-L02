@@ -62,7 +62,7 @@ class ExperimentResult:
 
     def last_fold_confusion(self) -> np.ndarray:
         return MetricsCalculator.confusion_matrix(
-            self.last_fold.y_true, self.last_fold.y_pred
+            self.last_fold.y_true, self.last_fold.y_pred, num_classes=len(self.classes)
         )
 
     def most_selected(self) -> CandidateScore:
@@ -97,6 +97,9 @@ class NestedCrossValidator:
         seed: int,
         device: torch.device,
         verbose: bool = True,
+        split_seed: int | None = None,
+        init_seed: int | None = None,
+        split_path=None,
     ) -> None:
         self.algorithm = algorithm
         self.base_model_config = base_model_config
@@ -105,7 +108,9 @@ class NestedCrossValidator:
         self.inner_folds = inner_folds
         self.use_grid = bool(grid)
         self.candidates = list(grid) if grid else [{}]
-        self.seed = seed
+        self.split_seed = seed if split_seed is None else split_seed
+        self.init_seed = seed if init_seed is None else init_seed
+        self.split_path = split_path
         self.device = device
         self.verbose = verbose
 
@@ -123,7 +128,33 @@ class NestedCrossValidator:
         """Ejecuta la validacion anidada sobre un objetivo."""
 
         X, y = data.X, data.y
-        outer_splits = StratifiedSplitter(self.outer_folds, self.seed).split(y)
+        outer_splits = StratifiedSplitter(self.outer_folds, self.split_seed).split(y)
+        splits_to_save = {"split_seed": np.array(self.split_seed), "target": np.array(data.target_name),
+                          "labels": y, "classes": np.asarray(data.classes)}
+        inner_splits = []
+        for outer_index, (train_idx, test_idx) in enumerate(outer_splits, start=1):
+            prefix = f"outer_{outer_index}"
+            splits_to_save[f"{prefix}_train"] = train_idx
+            splits_to_save[f"{prefix}_test"] = test_idx
+            splitter = StratifiedSplitter(self.inner_folds, self.split_seed + outer_index * 100)
+            local = [] if data.target_name == "GDS" or not splitter.can_split(y[train_idx]) else splitter.split(y[train_idx])
+            inner_splits.append(local)
+            splits_to_save[f"{prefix}_inner_skipped"] = np.array(not bool(local))
+            for inner_index, (inner_train, inner_val) in enumerate(local, start=1):
+                splits_to_save[f"{prefix}_inner_{inner_index}_train"] = train_idx[inner_train]
+                splits_to_save[f"{prefix}_inner_{inner_index}_val"] = train_idx[inner_val]
+        if self.split_path is not None:
+            from pathlib import Path
+            path = Path(self.split_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.exists():
+                with np.load(path, allow_pickle=False) as saved:
+                    if set(saved.files) != set(splits_to_save) or any(
+                        not np.array_equal(saved[key], value) for key, value in splits_to_save.items()
+                    ):
+                        raise ValueError(f"Las particiones existentes no coinciden: {path}. Use otra carpeta.")
+            else:
+                np.savez_compressed(path, **splits_to_save)
         search = self._search()
         result = ExperimentResult(
             algorithm=self.algorithm,
@@ -146,17 +177,23 @@ class NestedCrossValidator:
                 X_train,
                 y_train,
                 num_classes=data.num_classes,
-                seed=self.seed + outer_index * 100,
+                seed=self.split_seed + outer_index * 100,
+                init_seed=self.init_seed + outer_index * 100,
+                splits=inner_splits[outer_index - 1],
+                skip=not inner_splits[outer_index - 1],
             )
             if search_result.skipped:
-                print(
+                if data.target_name == "GDS":
+                    print(f"GDS fold externo {outer_index}: busqueda interna omitida por protocolo.")
+                else:
+                    print(
                     f"Aviso: el fold externo {outer_index} de {data.target_name} no "
                     f"admite {self.inner_folds} folds internos estratificados. "
                     "Se usa la configuracion base sin busqueda."
                 )
 
             selected = search_result.best
-            final_seed = self.seed + outer_index * 1000
+            final_seed = self.init_seed + outer_index * 1000
             trainer = Trainer.build(
                 self.algorithm,
                 selected.model_config,
@@ -190,6 +227,8 @@ class NestedCrossValidator:
 
         for metric in METRIC_KEYS:
             values = np.asarray([f.metrics[metric] for f in result.folds], dtype=float)
-            result.summary[f"mean_{metric}"] = float(values.mean())
-            result.summary[f"std_{metric}"] = float(values.std())
+            valid = values[np.isfinite(values)]
+            result.summary[f"valid_{metric}"] = len(valid)
+            result.summary[f"mean_{metric}"] = float(valid.mean()) if len(valid) else float("nan")
+            result.summary[f"std_{metric}"] = float(valid.std()) if len(valid) else float("nan")
         return result

@@ -111,6 +111,8 @@ def build_argument_parser() -> argparse.ArgumentParser:
 
     output = parser.add_argument_group("Ejecucion y reportes")
     output.add_argument("--seed", type=int, default=DEFAULT_RANDOM_SEED)
+    output.add_argument("--split-seed", type=int, default=None)
+    output.add_argument("--init-seed", type=int, default=None)
     output.add_argument("--device", choices=["auto", "cpu", "cuda"], default="cpu")
     output.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
     output.add_argument("--rank-metric", default=DEFAULT_RANK_METRIC, choices=METRIC_KEYS)
@@ -150,6 +152,8 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
             use_grid=not args.no_grid,
         ),
         seed=args.seed,
+        split_seed=args.split_seed,
+        init_seed=args.init_seed,
         device=args.device,
         output_dir=Path(args.output_dir),
         rank_metric=args.rank_metric,

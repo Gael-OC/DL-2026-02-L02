@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 from src.config import HYPERPARAMETER_GRID, ExperimentConfig, describe_configs
 from src.data.loader import DataFrameLoader
 from src.data.preprocessing import prepare_experiment_data
@@ -26,12 +28,15 @@ class ConsoleReporter:
         for metric in METRIC_KEYS:
             mean_value = result.summary[f"mean_{metric}"]
             std_value = result.summary[f"std_{metric}"]
-            print(f"  {metric}: {mean_value:.4f} +/- {std_value:.4f}")
+            print(f"  {metric}: {mean_value:.4f} +/- {std_value:.4f} "
+                  f"(validos: {result.summary[f'valid_{metric}']}/{len(result.folds)})")
         selected = result.most_selected()
         print(
             "Configuracion mas elegida: "
             + describe_configs(selected.model_config, selected.training_config)
         )
+        if any(not math.isfinite(fold.metrics["qwk"]) for fold in result.folds):
+            print("QWK no estimable en al menos un fold: desacuerdo esperado igual a cero.")
         print("Reporte del ultimo fold externo:")
         print(result.last_fold_report())
         print("Matriz de confusion del ultimo fold externo:")
@@ -86,6 +91,9 @@ class ExperimentRunner:
             inner_folds=inner_folds,
             grid=self._grid_for(algorithm),
             seed=self.config.seed,
+            split_seed=self.config.split_seed,
+            init_seed=self.config.init_seed,
+            split_path=self.config.output_dir / target_name / "splits.npz",
             device=self.device,
         )
         return validator.run(data)
