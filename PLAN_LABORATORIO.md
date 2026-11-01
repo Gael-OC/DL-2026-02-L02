@@ -54,8 +54,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | terminada | BCE con logits, reducción y estabilidad comprobadas el 28/10 |
 | [x] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | terminada | Pesos por número efectivo y origen de conteos comprobados el 28/10 |
 | [x] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | terminada | Corridas cortas con y sin pesos y prueba de integración aprobadas el 28/10 |
-| [ ] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | pendiente | — |
-| [ ] | J2.2 Boosting | Johan | 31/10 | J1.2 | pendiente | — |
+| [x] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | terminada | — |
+| [x] | J2.2 Boosting | Johan | 31/10 | J1.2 | terminada | — |
 | [ ] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | pendiente | — |
 | [ ] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | pendiente | — |
 | [ ] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | pendiente | — |
@@ -966,6 +966,8 @@ prueba corta no convierte un experimento final en terminado.
 | G2.3 | Gael | 28/10: pérdida BCE con logits, suma de umbrales y promedio del batch; equivalencia binaria, pesos unitarios y estabilidad comprobadas | G2.4 |
 | G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
 | G2.5 | Gael | 28/10: R2, una época y 2×2 folds, con y sin pesos; ambas corridas terminaron con métricas finitas; prueba de integración y suite completa aprobadas | G3 |
+| J2.1 | Johan | 31/10: ... | J2.3 |
+| J2.2 | Johan | 31/10: ... | J2.3 |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
