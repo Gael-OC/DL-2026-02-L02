@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, G3.1, G3.2, G3.3, G3.4 y G3.5 terminadas. Reparto de trabajo
+**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, J2.1, J2.2, J2.3, G3.1, G3.2, G3.3, G3.4 y G3.5 terminadas. Reparto de trabajo
 confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
 
 ### Tablero de tareas
@@ -54,9 +54,9 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.3 Pérdida CORAL | Gael | 29/10 | G2.1, G2.2 | terminada | BCE con logits, reducción y estabilidad comprobadas el 28/10 |
 | [x] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | terminada | Pesos por número efectivo y origen de conteos comprobados el 28/10 |
 | [x] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | terminada | Corridas cortas con y sin pesos y prueba de integración aprobadas el 28/10 |
-| [ ] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | pendiente | — |
-| [ ] | J2.2 Boosting | Johan | 31/10 | J1.2 | pendiente | — |
-| [ ] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | pendiente | — |
+| [x] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | terminada | Implementación de la red poco profunda de referencia ($15 \to H \to K$) con ReLU y dropout, integrando el grid interno sobre las 4 candidatas de hiperparámetros y validación aprobada en la suite de pruebas.    |
+| [x] | J2.2 Boosting | Johan | 31/10 | J1.2 | terminada | Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de $\text{max\_leaf\_nodes} \in \{3, 7, 15, 31\}$ guiado por MAE y QWK. |
+| [x] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | terminada | Ejecución del barrido OOF de todos los modelos de control sobre el objetivo GDS_R2 con partición externa de 5 folds, consolidación de la tabla de métricas y análisis comparativo. |
 | [x] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | terminada | Alfabeto completo, QWK no estimable, NLL/RPS y pruebas; corrida corta Softmax/R2 verificada |
 | [x] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | terminada | Índices globales persistidos, semillas separadas, GDS sin búsqueda interna y pruebas aprobadas |
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
@@ -966,6 +966,9 @@ prueba corta no convierte un experimento final en terminado.
 | G2.3 | Gael | 28/10: pérdida BCE con logits, suma de umbrales y promedio del batch; equivalencia binaria, pesos unitarios y estabilidad comprobadas | G2.4 |
 | G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
 | G2.5 | Gael | 28/10: R2, una época y 2×2 folds, con y sin pesos; ambas corridas terminaron con métricas finitas; prueba de integración y suite completa aprobadas | G3 |
+| J2.1 | Johan | 31/10: Implementación de la red poco profunda de referencia ($15 \to H \to K$) con ReLU y dropout, integrando el grid interno sobre las 4 candidatas de hiperparámetros y validación aprobada en la suite de pruebas. | J2.3 |
+| J2.2 | Johan | 31/10:  Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de $\text{max\_leaf\_nodes} \in \{3, 7, 15, 31\}$ guiado por MAE y QWK. | J2.3 |
+| J2.3 | Johan | 31/10: Ejecución del barrido OOF de todos los modelos de control sobre el objetivo GDS_R2 con partición externa de 5 folds, consolidación de la tabla de métricas y análisis comparativo. | J3.1/J3.2 |
 | G3.1 | Gael | 31/10: alfabeto completo, QWK no estimable, NLL/RPS y convenciones documentadas; 27 pruebas y corrida corta Softmax/R2 de 1 época y 2×2 folds aprobadas | G3.2 y G3.3; conectar NLL/RPS a probabilidades en G3.3 |
 | G3.2 | Gael | 31/10: splits globales compatibles con protocolo de controles, semillas separadas y omisión interna de GDS; 30 pruebas y corrida corta R2 aprobadas | G3.3 y G3.4 |
 | G3.3 | Gael | 31/10: logits y probabilidades Softmax/CORAL, validación de acumulativas y decisiones originales; 33 pruebas aprobadas | G3.4 y G3.5 |
@@ -974,7 +977,8 @@ prueba corta no convierte un experimento final en terminado.
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
-cortas, no resultados finales; los archivos de resultados no se versionan.
+cortas, no resultados finales, y permanecen sin versionar. El resumen de la
+comparación de controles versionado está en `results/controles/`.
 
 ### Registro de arranque H0.2 — 25/10/2026
 

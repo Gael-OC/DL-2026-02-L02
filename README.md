@@ -1,5 +1,31 @@
 # DL-2026-02-L02
 
+## Tabla Consolidada: Rendimiento OOF promedio de Controles en $GDS\_R2$
+(resultados/controles/metricas_controles_GDS_R2.csv)
+
+| Modelo de Control    | Estrategia / Configuración         | Accuracy (↑)  | Balanced Acc (↑) | MAE Ordinal (↓) | QWK (↑)       | Errores Graves (↓) |
+|----------------------|------------------------------------|---------------|------------------|-----------------|---------------|--------------------|
+| Constante (Moda)     | Moda global (Clase mayoritaria)    | 0.5800±0.0025 |         0.3333   | 0.5737±0.0044   |             0 | 0.1537±0.0023      |
+| Constante (Mediana)  | Mediana de la distribución         | 0.5800±0.0025 |         0.3333   | 0.5737±0.0044   |             0 | 0.1537±0.0023      |
+| Logística (Suma)     | Regresión Logística (Suma de bits) | 0.7363±0.0402 | 0.6486±0.0513    | 0.2816±0.0426   | 0.7023±0.0482 | 0.0179±0.0032      |
+| Logística (15 feats) | Regresión Logística (C por grid)   | 0.7256±0.0422 | 0.6425±0.0453    | 0.2914±0.0444   | 0.6908±0.0545 | 0.0170±0.0037      |
+| MLP Sencilla (Ref.)  | Red Neuronal Lab01 (15→H→K)        | 0.7238±0.0330 | 0.6203±0.0284    | 0.2985±0.0416   | 0.6633±0.0609 | 0.0224±0.0100      |
+| Hist. Grad. Boosting | Árboles con gradiente potenciado   | 0.7211±0.0405 | 0.6417±0.0424    | 0.2941±0.0442   | 0.6928±0.0547 | 0.0152±0.0040      |
+
+## Análisis y Conclusiones del Comportamiento de los Controles
+**1. Establecimiento de la Cota Inferior (Predictores Constantes):**
+Los modelos basados en moda y mediana alcanzan una exactitud aproximada del $58\%$, pero con un QWK de $0.0$ y un MAE ordinal elevado ($\approx 0.57$), lo que evidencia que una estrategia ingenua es totalmente incapaz de capturar la estructura ordenada de las clases en $GDS\_R2$, incurriendo en tasas de errores graves cercanas al $15.3\%$. Esto confirma que cualquier arquitectura neuronal profunda posterior tiene una valla clara que superar obligatoriamente.
+
+<br>
+
+**2. Competitividad Sorprendente del Modelo Lineal Simple (logistica_suma):**
+Resulta sumamente notable que la Regresión Logística operando sobre la simple suma de bits de las entradas alcance el mejor desempeño general del bloque de control, con un QWK de $0.7023$ y un MAE de $0.2816$. Esto demuestra que la acumulación lineal de características cognitivas posee una correlación directa y muy fuerte con el objetivo $GDS\_R2$.
+
+<br>
+
+**3. Paridad entre Modelos Lineales, Neuronales y Tabulares:**
+La Regresión Logística sobre las 15 características completas, la MLP sencilla de referencia y el HistGradientBoosting se mueven en un rango de rendimiento muy cerrado (QWK entre $0.663$ y $0.693$). El HistGradientBoosting registra menos errores graves que la MLP (1.52\% frente a 2.24\%); los tres modelos mantienen resultados cercanos en el resto de las métricas.
+
 Organización del equipo: [plan, tareas y registro de avances](PLAN_LABORATORIO.md).
 
 Proyecto base del **Laboratorio 02 de Deep Learning** (segundo semestre 2026):
