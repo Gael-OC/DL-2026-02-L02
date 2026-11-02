@@ -62,9 +62,10 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
 | [x] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | terminada | Manifiesto, ajustes, candidatas y folds recuperables; interrupción y reanudación verificadas |
 | [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
-| [ ] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | pendiente | — |
+| [ ] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | en revisión | CPU local y servidor medidas; GPU no disponible, pendiente G4.4 |
 | [ ] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | pendiente | — |
 | [ ] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | pendiente | — |
+| [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | pendiente | — |
 | [ ] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | pendiente | — |
 | [ ] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | pendiente | — |
 | [ ] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | pendiente | — |
@@ -637,23 +638,50 @@ ponderada y no ponderada nunca se sobrescriben ni se combinan por nombre.
 ### G4.1 — Piloto de cómputo
 
 **Responsable:** Gael. **Fecha:** 01/11. **Duración:** 60–120 min más cómputo.
-**Insumos:** servidor y un ajuste representativo de 20 épocas en R2.
+**Insumos:** CPU local y del servidor, y un ajuste representativo de 20 épocas en R2.
 
 1. Registrar entorno y recursos reales del servidor.
-2. Comparar CPU y GPU con tres repeticiones; incluir carga, ajuste y evaluación.
-3. Comparar pocos procesos independientes, limitando hilos, y elegir por ajustes/tiempo.
+2. Comparar CPU local y servidor con tres repeticiones; incluir carga, ajuste y evaluación.
+3. Comparar pocos procesos independientes, limitando hilos, y elegir por ajustes/tiempo. La comparación con GPU se traslada a G4.4 por su fallo de inicialización.
 
 **Entregable:** tabla de tiempos y configuración de ejecución documentada.
 **Comprobación:** mismos datos/configuración de referencia y métricas válidas.
-**Aceptación:** elección respaldada por mediciones. No sumar la memoria de las
-dos GPU ni distribuir una sola red pequeña entre ambas por defecto.
+**Aceptación:** elección provisional respaldada por mediciones y fallo de GPU registrado.
+No sumar la memoria de las dos GPU ni distribuir una sola red pequeña entre ambas por defecto.
+
+**Medición 01/11:** Softmax R2, configuración base, 20 épocas, primer fold
+externo de cinco, semilla 42 y un hilo por proceso. Cada repetición incluye
+arranque de procesos, carga, ajuste y evaluación. Con dos procesos se ejecutó
+el mismo ajuste independientemente en cada uno; no es una corrida de validación completa.
+
+| Entorno | Procesos | Tiempos totales de las tres repeticiones (s) | Ajustes/minuto agregados |
+|---|---:|---|---:|
+| CPU local | 1 | 4.34, 3.03, 2.94 | 17.46 |
+| CPU local | 2 | 3.36, 3.30, 3.27 | 36.29 |
+| CPU servidor | 1 | 9.19, 3.75, 3.76 | 10.78 |
+| CPU servidor | 2 | 3.77, 3.91, 3.74 | 31.53 |
+
+Las 18 ejecuciones dieron métricas finitas e idénticas, con 895 filas de
+entrenamiento y 224 de evaluación. El SAV tiene el mismo SHA-256 en ambos
+equipos. Servidor: AMD EPYC 7543, 64 CPU lógicas, 503 GiB RAM; Python 3.10.21,
+PyTorch 2.14.0+cu130. Local: Python 3.10.21, PyTorch 2.14.0, CPU; MPS no
+disponible. La primera repetición del servidor fue más lenta. Las mediciones
+son orientativas, no tiempos garantizados para las corridas completas.
+
+`nvidia-smi` devolvió `Failed to initialize NVML: Unknown Error` y PyTorch
+informó CUDA no disponible. Se acuerda avanzar provisionalmente en CPU local
+con un hilo por proceso. El piloto respalda hasta dos procesos independientes;
+la herramienta de experimentos no los programa automáticamente. Conservar
+salidas separadas y evitar duplicar ajustes si se decide paralelizar. Datos de
+medición en `results/g4_piloto/`; repetir con `python -m experimentos.piloto_cpu
+'dataset/15 atributos R0-R5.sav'` desde la raíz del proyecto.
 
 ### G4.2 — Reproducción obligatoria completa
 
 **Responsable:** Gael. **Fecha:** 02/11. **Duración:** 60–90 min de preparación
 y control, más cómputo. **Insumos:** pruebas anteriores aprobadas y piloto.
 
-1. Ejecutar las tres variantes y los seis objetivos con el protocolo congelado.
+1. Ejecutar en CPU local provisionalmente las tres variantes y los seis objetivos con el protocolo congelado.
 2. Validar registros, soportes, candidatas, cobertura OOF y excepciones.
 
 **Entregable:** corrida completa identificada y verificación de integridad.
@@ -673,6 +701,21 @@ corrida obligatoria y documentación docente.
 **Comprobación:** regeneración de tablas y lista de requisitos de la sección 7.
 **Aceptación:** comparación obligatoria completa y explicable, sin depender de
 que estén terminadas las extensiones.
+
+### G4.4 — Revisar servidor y GPU
+
+**Responsable:** Gael. **Fecha interna:** 04/11. **Dependencias:** ninguna;
+no bloquea G4.2 ni G4.3. **Insumos:** diagnóstico y resultados de G4.1.
+
+1. Volver a comprobar `nvidia-smi` y la disponibilidad de CUDA en PyTorch.
+2. Si la GPU funciona, repetir el piloto con tres repeticiones en CPU y GPU,
+   mismas entradas y configuración, incluyendo carga, ajuste y evaluación.
+3. Comparar resultados y rendimiento; decidir si conviene usar el servidor
+   para trabajo pendiente, conservando configuración, semillas y registros.
+
+**Entregable:** diagnóstico, tiempos si la GPU está disponible y decisión.
+**Aceptación:** fallo o comparación documentados; no repetir resultados ya
+completados solo por cambiar de equipo.
 
 ### J3.1 — Modelos para localidad
 
@@ -974,6 +1017,7 @@ prueba corta no convierte un experimento final en terminado.
 | G3.3 | Gael | 31/10: logits y probabilidades Softmax/CORAL, validación de acumulativas y decisiones originales; 33 pruebas aprobadas | G3.4 y G3.5 |
 | G3.4 | Gael | 31/10: manifiesto, ajustes, selección y checkpoints por fold; interrupción simulada y reanudación comprobadas, 34 pruebas y corrida corta R2 aprobadas | G3.5 |
 | G3.5 | Gael | 31/10: predicciones OOF, métricas, confusiones y regeneración sin entrenamiento; 35 pruebas y corrida corta R2 comprobadas | G4.1 |
+| G4.1 | Gael | 01/11: CPU local y servidor medidas con tres repeticiones y 1/2 procesos; GPU no inicializa; evidencia en `results/g4_piloto/` | Revisar piloto; G4.2 local provisional y G4.4 para reintentar GPU |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
