@@ -55,19 +55,19 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.4 Pesos por clase | Gael | 29/10 | G2.3 | terminada | Pesos por número efectivo y origen de conteos comprobados el 28/10 |
 | [x] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | terminada | Corridas cortas con y sin pesos y prueba de integración aprobadas el 28/10 |
 | [x] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | terminada | Implementación de la red poco profunda de referencia ($15 \to H \to K$) con ReLU y dropout, integrando el grid interno sobre las 4 candidatas de hiperparámetros y validación aprobada en la suite de pruebas.    |
-| [x] | J2.2 Boosting | Johan | 31/10 | J1.2 | terminada | Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de $\text{max\_leaf\_nodes} \in \{3, 7, 15, 31\}$ guiado por MAE y QWK. |
+| [x] | J2.2 Boosting | Johan | 31/10 | J1.2 | terminada | Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de *max_leaf_nodes* $\in \{3, 7, 15, 31\}$ guiado por MAE y QWK. |
 | [x] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | terminada | Ejecución del barrido OOF de todos los modelos de control sobre el objetivo GDS_R2 con partición externa de 5 folds, consolidación de la tabla de métricas y análisis comparativo. |
 | [x] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | terminada | Alfabeto completo, QWK no estimable, NLL/RPS y pruebas; corrida corta Softmax/R2 verificada |
 | [x] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | terminada | Índices globales persistidos, semillas separadas, GDS sin búsqueda interna y pruebas aprobadas |
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
 | [x] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | terminada | Manifiesto, ajustes, candidatas y folds recuperables; interrupción y reanudación verificadas |
 | [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
-| [ ] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | en revisión | CPU local y servidor medidas; GPU no disponible, pendiente G4.4 |
+| [x] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | en revisión | CPU local y servidor medidas; GPU no disponible, pendiente G4.4 |
 | [ ] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | pendiente | — |
 | [ ] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | pendiente | — |
 | [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | pendiente | — |
-| [ ] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | pendiente | — |
-| [ ] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | pendiente | — |
+| [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
+| [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
 | [ ] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | pendiente | — |
 | [ ] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | pendiente | — |
 | [ ] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | pendiente | — |
@@ -1010,7 +1010,7 @@ prueba corta no convierte un experimento final en terminado.
 | G2.4 | Gael | 28/10: pesos por número efectivo, clases ausentes y conteos de entrenamiento comprobados; suite completa aprobada | G2.5 |
 | G2.5 | Gael | 28/10: R2, una época y 2×2 folds, con y sin pesos; ambas corridas terminaron con métricas finitas; prueba de integración y suite completa aprobadas | G3 |
 | J2.1 | Johan | 31/10: Implementación de la red poco profunda de referencia ($15 \to H \to K$) con ReLU y dropout, integrando el grid interno sobre las 4 candidatas de hiperparámetros y validación aprobada en la suite de pruebas. | J2.3 |
-| J2.2 | Johan | 31/10:  Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de $\text{max\_leaf\_nodes} \in \{3, 7, 15, 31\}$ guiado por MAE y QWK. | J2.3 |
+| J2.2 | Johan | 31/10:  Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de *max_leaf_nodes* $\in \{3, 7, 15, 31\}$ guiado por MAE y QWK. | J2.3 |
 | J2.3 | Johan | 31/10: Ejecución del barrido OOF de todos los modelos de control sobre el objetivo GDS_R2 con partición externa de 5 folds, consolidación de la tabla de métricas y análisis comparativo. | J3.1/J3.2 |
 | G3.1 | Gael | 31/10: alfabeto completo, QWK no estimable, NLL/RPS y convenciones documentadas; 27 pruebas y corrida corta Softmax/R2 de 1 época y 2×2 folds aprobadas | G3.2 y G3.3; conectar NLL/RPS a probabilidades en G3.3 |
 | G3.2 | Gael | 31/10: splits globales compatibles con protocolo de controles, semillas separadas y omisión interna de GDS; 30 pruebas y corrida corta R2 aprobadas | G3.3 y G3.4 |
@@ -1018,6 +1018,8 @@ prueba corta no convierte un experimento final en terminado.
 | G3.4 | Gael | 31/10: manifiesto, ajustes, selección y checkpoints por fold; interrupción simulada y reanudación comprobadas, 34 pruebas y corrida corta R2 aprobadas | G3.5 |
 | G3.5 | Gael | 31/10: predicciones OOF, métricas, confusiones y regeneración sin entrenamiento; 35 pruebas y corrida corta R2 comprobadas | G4.1 |
 | G4.1 | Gael | 01/11: CPU local y servidor medidas con tres repeticiones y 1/2 procesos; GPU no inicializa; evidencia en `results/g4_piloto/` | Revisar piloto; G4.2 local provisional y G4.4 para reintentar GPU |
+| J3.1 | Johan | 03/11: Implementación de CNN-k3 (17,219 parámetros), CNN-k1 y MLP de capacidad próxima (17,231 parámetros) en el módulo de localidad, con pruebas unitarias aprobadas. | J3.2 |
+| J3.2 | Johan | 03/11: Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. | J4.1/J4.2 |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
