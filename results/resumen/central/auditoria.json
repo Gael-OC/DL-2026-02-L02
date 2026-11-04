@@ -1,0 +1,14 @@
+{
+  "fecha": "2026-11-04",
+  "eventos_por_corrida": {
+    "g4_2_central_unweighted": 654,
+    "g4_2_central_weighted": 327
+  },
+  "eventos_total": 981,
+  "combinaciones": 18,
+  "folds_externos": 81,
+  "filas_oof_por_combinacion": 1119,
+  "resultado": "aprobada",
+  "reentrenamiento": false,
+  "nota": "Valida artefactos persistidos y selección; no reproduce numéricamente los entrenamientos."
+}

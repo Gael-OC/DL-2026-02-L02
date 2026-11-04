@@ -1,5 +1,15 @@
 # DL-2026-02-L02
 
+Avance del 04/11: corrida central completa y auditada (981 ajustes),
+[seis tablas comparativas](results/resumen/central/comparacion.md) y
+[borrador del informe](docs/informe.md). Las salidas por fila permanecen locales.
+
+**Controles R2 históricos:** las cifras siguientes requieren revisión antes de
+integrarlas a la comparación final. El ejecutor actual usa un solo fold interno,
+omite el refit externo completo y entrena la MLP diez épocas; la llamada a las
+constantes también mezcla etiquetas originales con índices. Se conserva el
+trabajo de Johan y se registra esta dependencia para H5.2.
+
 ## Tabla Consolidada: Rendimiento OOF promedio de Controles en $GDS\_R2$
 (resultados/controles/metricas_controles_GDS_R2.csv)
 
@@ -66,10 +76,12 @@ estrategia de entrenamiento (`ClassificationTask`).
 - Reportes: CSV, Markdown, rankings, graficos de barras, matrices de confusion
   y la configuracion elegida en cada fold (`seleccion_hp.csv`).
 
-## Que queda como TODO (alumno)
+## Próximos entregables
 
-- Comparar `conv1d_softmax` y `conv1d_coral` (con y sin pesos) en los seis
-  objetivos y completar el informe.
+- Integrar las extensiones de decisiones, perfiles y robustez con los controles
+  y el estudio de localidad; revisar conjuntamente el informe y producir el PDF.
+- La comparación obligatoria de tres variantes y seis objetivos ya está
+  disponible en `results/resumen/central/`.
 
 Detalle en [docs/04_extension_ordinal.md](docs/04_extension_ordinal.md).
 

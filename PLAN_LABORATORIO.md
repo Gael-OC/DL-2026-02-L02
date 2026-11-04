@@ -63,8 +63,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | terminada | Manifiesto, ajustes, candidatas y folds recuperables; interrupción y reanudación verificadas |
 | [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
 | [x] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | terminada | Revisión 04/11: 18 ajustes válidos; CPU local, un hilo y hasta dos procesos |
-| [ ] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | pendiente | — |
-| [ ] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | pendiente | — |
+| [x] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | terminada | 04/11: auditoría reproducible aprobada, 981 ajustes y 81 folds; results/resumen/central/auditoria.json |
+| [x] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | terminada | 04/11: seis tablas de tres variantes, NLL/RPS y confusiones OOF; docs/informe.md |
 | [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | bloqueada | 04/11: timeout y autenticación rechazada en puente SSH; GPU actual sin comprobar |
 | [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
@@ -694,6 +694,15 @@ y control, más cómputo. **Insumos:** pruebas anteriores aprobadas y piloto.
 **Aceptación:** 18 combinaciones completas y 981 ajustes centrales; 27 folds
 externos por variante. GDS conserva configuración base y búsqueda omitida.
 
+**Cierre 04/11:** las corridas centrales locales ya contenían 654 ajustes sin
+pesos y 327 ponderados. Auditoría reproducible sin reentrenar: manifiestos y
+hashes, protocolo, semillas, eventos únicos, índices sin solapamientos,
+soportes, pesos obtenidos de train, selección de candidatas, logits,
+probabilidades, decisiones, métricas y exportación OOF comprobados. Son
+18 combinaciones, 81 folds externos y 1119 predicciones por combinación.
+Las particiones coinciden entre carpetas. Comandos y evidencia agregada en
+`results/README.md` y `results/resumen/central/`.
+
 ### G4.3 — Primera versión entregable
 
 **Responsable:** Gael. **Fecha:** 02/11. **Duración:** 90–120 min. **Insumos:**
@@ -706,6 +715,18 @@ corrida obligatoria y documentación docente.
 **Comprobación:** regeneración de tablas y lista de requisitos de la sección 7.
 **Aceptación:** comparación obligatoria completa y explicable, sin depender de
 que estén terminadas las extensiones.
+
+**Cierre 04/11:** seis tablas con nueve métricas (media ± std, ddof=0),
+complemento NLL/RPS, confusiones agregadas y frecuencias del grid regenerables
+sin entrenar. Borrador único en `docs/informe.md`, organizado según plantilla;
+incluye respuestas provisionales a las siete preguntas y límites de la
+comparación. El PDF conjunto y la validación de páginas siguen en H6.
+
+**Dependencia de integración:** antes de H5.2, revisar con Johan el ejecutor
+de controles: usa solo un fold interno, no realiza refit externo completo,
+fija diez épocas para la MLP y mezcla índices con clases originales al llamar
+las constantes. No se modificaron sus módulos ni se consideran sus cifras
+históricas una comparación final bajo el protocolo congelado.
 
 ### G4.4 — Revisar servidor y GPU
 
