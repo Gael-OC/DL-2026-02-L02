@@ -10,8 +10,17 @@ venv/
 dataset/*
 !dataset/README.md
 
-# Tablas y graficos generados por main.py.
+# Corridas y predicciones individuales locales; solo agregados seleccionados.
+results/*
 !results/README.md
+!results/resumen/
+results/resumen/*
+!results/resumen/central/
+!results/resumen/decisiones/
+!results/resumen/perfiles/
+!results/resumen/analisis/
+!results/resumen/robustez/
+.DS_Store
 
 # Material exclusivo del profesor (solucion de referencia).
 docente/

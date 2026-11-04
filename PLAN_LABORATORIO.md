@@ -62,10 +62,10 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
 | [x] | G3.4 Registros de ajustes | Gael | 31/10 | G3.2 | terminada | Manifiesto, ajustes, candidatas y folds recuperables; interrupción y reanudación verificadas |
 | [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
-| [x] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | en revisión | CPU local y servidor medidas; GPU no disponible, pendiente G4.4 |
+| [x] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | terminada | Revisión 04/11: 18 ajustes válidos; CPU local, un hilo y hasta dos procesos |
 | [ ] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | pendiente | — |
 | [ ] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | pendiente | — |
-| [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | pendiente | — |
+| [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | bloqueada | 04/11: timeout y autenticación rechazada en puente SSH; GPU actual sin comprobar |
 | [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
 | [ ] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | pendiente | — |
@@ -676,6 +676,11 @@ salidas separadas y evitar duplicar ajustes si se decide paralelizar. Datos de
 medición en `results/g4_piloto/`; repetir con `python -m experimentos.piloto_cpu
 'dataset/15 atributos R0-R5.sav'` desde la raíz del proyecto.
 
+**Revisión 04/11:** las 18 ejecuciones del piloto conservan métricas finitas e
+idénticas y soportes de 895/224 filas. G4.1 queda terminada con la elección de
+CPU local, un hilo por proceso y hasta dos procesos independientes. La suite
+local de 39 pruebas está aprobada; no se repitió el piloto ni la corrida central.
+
 ### G4.2 — Reproducción obligatoria completa
 
 **Responsable:** Gael. **Fecha:** 02/11. **Duración:** 60–90 min de preparación
@@ -716,6 +721,15 @@ no bloquea G4.2 ni G4.3. **Insumos:** diagnóstico y resultados de G4.1.
 **Entregable:** diagnóstico, tiempos si la GPU está disponible y decisión.
 **Aceptación:** fallo o comparación documentados; no repetir resultados ya
 completados solo por cambiar de equipo.
+
+**Intento 04/11:** acceso al alias SSH configurado, con autenticación no
+interactiva y sin modificar el servidor. La conexión inicial fue restringida
+por el entorno; el reintento con acceso de red terminó con timeout durante el
+intercambio de identificación y autenticación rechazada en el puente. No se
+alcanzó el servidor de cómputo ni se pudo ejecutar `nvidia-smi` o consultar
+CUDA. G4.4 permanece bloqueada por acceso: esto no confirma que continúe el
+fallo NVML del 01/11. Continuar localmente; conservar diagnóstico detallado
+sin credenciales en las notas locales.
 
 ### J3.1 — Modelos para localidad
 
