@@ -25,6 +25,12 @@ no equivale al agregado de todas las filas OOF. GDS usa dos folds externos y
 configuración base con búsqueda omitida. Las cinco recodificaciones usan 5×3
 folds y cuatro candidatas. NLL y RPS complementan las nueve métricas exigidas.
 
+## Decisiones por moda y mediana
+
+`python -m experimentos.decisiones` reutiliza las probabilidades de las
+corridas centrales sin entrenar modelos. Guarda agregados por fold y OOF en
+`resumen/decisiones/`; las predicciones individuales permanecen locales.
+
 ## Regeneración y entorno
 
 Activar `lab_pytorch` y ejecutar desde la raíz del repositorio. Para limitar

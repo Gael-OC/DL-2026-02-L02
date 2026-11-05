@@ -32,8 +32,10 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 31/10/2026:** H0.1, H0.2, H0.3, G1.1, G1.2, J1.1, J1.2, G2.1, G2.2, G2.3, G2.4, G2.5, J2.1, J2.2, J2.3, G3.1, G3.2, G3.3, G3.4 y G3.5 terminadas. Reparto de trabajo
-confirmado por ambos; las demás tareas y fechas del tablero se mantienen.
+**Estado al 04/11/2026:** las tareas de Gael hasta G5.1 están terminadas,
+salvo G4.4, bloqueada por acceso al servidor. G5.2 y las tareas posteriores,
+incluida la integración conjunta, quedan pendientes para otro día. Se conserva
+el avance de Johan ya compartido en el repositorio.
 
 ### Tablero de tareas
 
@@ -68,7 +70,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | bloqueada | 04/11: timeout y autenticación rechazada en puente SSH; GPU actual sin comprobar |
 | [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
-| [ ] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | pendiente | — |
+| [x] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | terminada | 04/11: reglas sobre probabilidades OOF, comparación por fold y equivalencia binaria comprobadas |
 | [ ] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | pendiente | — |
 | [ ] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | pendiente | — |
 | [ ] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | pendiente | — |
@@ -790,6 +792,11 @@ probabilidades externas de las tres variantes obligatorias.
 **Comprobación:** `python -m unittest discover -s tests -p 'test_decisiones.py' -v`.
 **Aceptación:** cero nuevos entrenamientos, probabilidades idénticas entre
 reglas y decisiones equivalentes en R3 con el desempate definido.
+
+**Cierre 04/11:** `experimentos/decisiones.py` compara la decisión original,
+moda y mediana inferior con las probabilidades existentes. En R3 coinciden las
+tres reglas para las 3357 predicciones. Los agregados están en
+`results/resumen/decisiones/`; no se realizaron nuevos entrenamientos.
 
 ### G5.2 — Predictor por perfil
 
