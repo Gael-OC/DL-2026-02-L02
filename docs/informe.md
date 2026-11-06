@@ -1,8 +1,8 @@
 # Laboratorio 02: comparación categórica y ordinal con Conv1D
 
 **Borrador de las secciones de Gael — 04/11/2026.** Equipo: Gael y Johan.
-Sigue las secciones de la plantilla docente; la integración, ajuste de páginas,
-referencias finales, autoevaluación y PDF corresponden a H6.1–H6.3.
+Sigue las secciones de la plantilla docente. Faltan la integración, el ajuste
+de páginas, las referencias finales, la autoevaluación y la exportación a PDF.
 
 ## Resumen provisional
 
@@ -51,7 +51,7 @@ descriptiva del archivo, no un límite poblacional. Un ID único tampoco prueba
 que cada fila corresponda a una persona distinta. La procedencia exacta del
 instrumento y el significado de algunos nombres no están confirmados.
 
-Se mantuvo el protocolo del [plan de laboratorio](../PLAN_LABORATORIO.md):
+Se mantuvo el protocolo experimental fijado antes de evaluar:
 Adam, 20 épocas, batch 32, learning rate 0.001 y weight decay 0.0001. Las
 cinco recodificaciones usan validación anidada de cinco folds externos y tres
 internos, con cuatro candidatas de arquitectura. La selección minimiza MAE

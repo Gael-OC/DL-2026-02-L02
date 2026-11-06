@@ -4,11 +4,14 @@ Avance del 04/11: corrida central completa y auditada (981 ajustes),
 [seis tablas comparativas](results/resumen/central/comparacion.md) y
 [borrador del informe](docs/informe.md). Las salidas por fila permanecen locales.
 
+El predictor por perfil incluye 6714 predicciones verificadas en los seis
+objetivos. [Resultados y reproducción](results/README.md#predictor-por-perfil).
+
 **Controles R2 históricos:** las cifras siguientes requieren revisión antes de
 integrarlas a la comparación final. El ejecutor actual usa un solo fold interno,
 omite el refit externo completo y entrena la MLP diez épocas; la llamada a las
 constantes también mezcla etiquetas originales con índices. Se conserva el
-trabajo de Johan y se registra esta dependencia para H5.2.
+trabajo de Johan; estos resultados deben revisarse antes de integrarlos al informe.
 
 ## Tabla Consolidada: Rendimiento OOF promedio de Controles en $GDS\_R2$
 (resultados/controles/metricas_controles_GDS_R2.csv)
@@ -35,8 +38,6 @@ Resulta sumamente notable que la Regresión Logística operando sobre la simple 
 
 **3. Paridad entre Modelos Lineales, Neuronales y Tabulares:**
 La Regresión Logística sobre las 15 características completas, la MLP sencilla de referencia y el HistGradientBoosting se mueven en un rango de rendimiento muy cerrado (QWK entre $0.663$ y $0.693$). El HistGradientBoosting registra menos errores graves que la MLP (1.52\% frente a 2.24\%); los tres modelos mantienen resultados cercanos en el resto de las métricas.
-
-Organización del equipo: [plan, tareas y registro de avances](PLAN_LABORATORIO.md).
 
 Proyecto base del **Laboratorio 02 de Deep Learning** (segundo semestre 2026):
 redes con una **capa convolucional 1D** para predecir la etapa de deterioro

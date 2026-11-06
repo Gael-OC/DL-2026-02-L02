@@ -1,0 +1,12 @@
+{
+  "filas_oof": 6714,
+  "folds": 27,
+  "vistas": 5406,
+  "nuevas": 1308,
+  "referencia": {
+    "estado": "coincidencia_exacta",
+    "filas": 6714
+  },
+  "manifest_sha256": "eaaa0c63f3f6e95ec68f5912045d26b9a84680ceae9f3bc00b53a5e4d02285c3",
+  "convencion": "resumen_folds: media/std ddof=0 externos; oof: agregado de filas"
+}

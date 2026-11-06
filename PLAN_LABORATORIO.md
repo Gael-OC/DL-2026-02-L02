@@ -32,10 +32,11 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 04/11/2026:** las tareas de Gael hasta G5.1 están terminadas,
-salvo G4.4, bloqueada por acceso al servidor. G5.2 y las tareas posteriores,
-incluida la integración conjunta, quedan pendientes para otro día. Se conserva
-el avance de Johan ya compartido en el repositorio.
+**Estado al 06/11/2026:** la comparación central, G5.1 y G5.2 están terminadas.
+Las tareas posteriores, incluida la integración conjunta,
+conservan su estado del tablero. Se conserva el avance de Johan ya compartido.
+Por decisión de Gael, el cómputo y los artefactos restantes se mantendrán en
+local. G4.4 conserva el bloqueo histórico; no se reintentará el acceso al servidor.
 
 ### Tablero de tareas
 
@@ -71,7 +72,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
 | [x] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | terminada | 04/11: reglas sobre probabilidades OOF, comparación por fold y equivalencia binaria comprobadas |
-| [ ] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | pendiente | — |
+| [x] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | terminada | 06/11: 6714 predicciones, 27 folds, coincidencia exacta con referencia; siete pruebas nuevas y suite de 53 aprobadas |
 | [ ] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | pendiente | — |
 | [ ] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | pendiente | — |
 | [ ] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | pendiente | — |
@@ -812,6 +813,22 @@ datos y particiones comunes, regla de suavizado y respaldo.
 **Aceptación:** probabilidades válidas, moda/mediana y marca visto/nuevo;
 ningún conteo depende de etiquetas externas. Los perfiles no se eliminan.
 
+**Cierre 06/11:** `experimentos/perfiles.py` implementa el predictor con alpha=1
+y respaldo global suavizado, usando exclusivamente entrenamiento externo.
+`tests/test_perfiles.py` comprueba duplicados contradictorios, perfiles nuevos,
+clases ausentes, empates, independencia de etiquetas externas, integridad de
+splits y conservación de salidas. Siete pruebas específicas y las 53 de la
+suite completa aprobadas en `lab_pytorch`.
+
+La corrida local `results/g5_2_perfiles/` conserva las 6714 predicciones
+(1119 por objetivo), las clases originales y hashes de datos, código y splits
+en su manifiesto. Se reutilizaron los 27 folds centrales, sin entrenar redes:
+5406 predicciones corresponden a perfiles vistos y 1308 a nuevos. Las filas
+coinciden exactamente con el modelo `perfil` de `results/g5_perfiles/filas.csv`,
+que permanece intacto. Las métricas por fold, media/std externa y agregado OOF
+están separadas en `results/resumen/perfiles/`; comandos en `results/README.md`.
+El siguiente paso es G5.3, con sus figuras y discusión. Todo permanece local.
+
 ### G5.3 — Interpretación de decisiones y perfiles
 
 **Responsable:** Gael. **Fecha:** 05/11. **Duración:** 90–120 min. **Insumos:**
@@ -1062,6 +1079,7 @@ prueba corta no convierte un experimento final en terminado.
 | G4.1 | Gael | 01/11: CPU local y servidor medidas con tres repeticiones y 1/2 procesos; GPU no inicializa; evidencia en `results/g4_piloto/` | Revisar piloto; G4.2 local provisional y G4.4 para reintentar GPU |
 | J3.1 | Johan | 03/11: Implementación de CNN-k3 (17,219 parámetros), CNN-k1 y MLP de capacidad próxima (17,231 parámetros) en el módulo de localidad, con pruebas unitarias aprobadas. | J3.2 |
 | J3.2 | Johan | 03/11: Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. | J4.1/J4.2 |
+| G5.2 | Gael | 06/11: predictor reproducible local, 6714 filas y 27 folds, coincidencia exacta con referencia y 53 pruebas aprobadas; manifiesto y agregados conservados | G5.3: figuras y discusión de decisiones/perfiles |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
