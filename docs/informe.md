@@ -1,6 +1,6 @@
 # Laboratorio 02: comparación categórica y ordinal con Conv1D
 
-**Borrador de las secciones de Gael — 04/11/2026.** Equipo: Gael y Johan.
+**Borrador de las secciones de Gael — 06/11/2026.** Equipo: Gael y Johan.
 Sigue las secciones de la plantilla docente. Faltan la integración, el ajuste
 de páginas, las referencias finales, la autoevaluación y la exportación a PDF.
 
@@ -69,6 +69,22 @@ un estadístico distinto. NLL protege solo el logaritmo con el menor positivo
 del dtype, y RPS se normaliza por K−1. En R3 el alfabeto original 1/3 se
 transforma a 0/1, por lo que MAE=1−accuracy y los errores graves son cero.
 
+El análisis adicional aplica moda y mediana inferior a las mismas probabilidades
+externas, sin nuevos entrenamientos ni selección de reglas con test. Conserva
+la decisión original de cada red como referencia; las redes no se volvieron a
+seleccionar para cada regla. El predictor por perfil cuenta etiquetas de las
+15 respuestas exactas solo en entrenamiento externo, con suavizado aditivo uno
+por clase. Para perfiles nuevos usa las frecuencias globales de entrenamiento
+con el mismo suavizado. No elimina respuestas repetidas ni utiliza el ID.
+
+Las 20142 predicciones de las redes se cruzan con 6714 del predictor por perfil
+por objetivo, índice global y fold, comprobando etiquetas y probabilidades
+contra sus artefactos de origen. Visto/nuevo describe la presencia del perfil
+en entrenamiento, no la identidad de la persona. Se conserva soporte por clase
+y grupo; recalls sin soporte se declaran no estimables. El error firmado es
+predicción−verdad: negativo indica subestimación. La figura de perfiles usa
+mediana como regla común prefijada; las tablas conservan también las otras reglas.
+
 ## Resultados de la comparación obligatoria
 
 Las [seis tablas completas](../results/resumen/central/comparacion.md) incluyen las
@@ -85,6 +101,49 @@ diferencias pequeñas requieren el análisis de estabilidad previsto. En GDS,
 los MAE fueron 0.4737, 0.6890 y 0.7891; el soporte mínimo de la etapa 7 y los
 dos folds limitan la interpretación. En R3, los MAE fueron 0.0920, 0.0992 y
 0.0992; ninguna variante puede cometer errores de distancia dos en ese alfabeto.
+
+## Resultados de decisiones y perfiles
+
+Las [tablas y discusión completas](../results/resumen/analisis/discusion.md)
+se reconstruyen desde los artefactos locales, sin entrenamiento. La
+[figura de decisiones](../results/resumen/analisis/decisiones.png) muestra
+diferencias mediana−moda por fold y su media; no representa intervalos de confianza.
+En Softmax/R2, el cambio medio externo de MAE es −0.0062 ± 0.0073, con 33
+decisiones OOF distintas. El MAE OOF pasa de 0.2895 a 0.2833; estos agregados
+de filas son distintos de los promedios externos. La tasa OOF de subestimación
+pasa de 18.1 % a 17.3 %, y la de sobreestimación, de 9.2 % a 9.5 %.
+
+La mediana no mejora uniformemente: Softmax aumenta ligeramente el MAE en
+GDS y R4, y el predictor por perfil aumenta en GDS y R1. En R3 no cambia ninguna
+decisión de los cuatro modelos. En CORAL, la mediana coincide con la decisión
+original en todas estas predicciones; su ventaja frente a la moda de las
+probabilidades de clase no es una mejora respecto de la comparación obligatoria.
+NLL y RPS se mantienen al cambiar solo la regla, porque las probabilidades no cambian.
+
+En R2 hay 900 filas con perfiles vistos en entrenamiento y 219 con nuevos.
+La [figura de perfiles](../results/resumen/analisis/perfiles.png) muestra MAE
+OOF con mediana común en los seis objetivos; el siguiente detalle es R2:
+
+| Modelo | MAE vistos | MAE nuevos | Errores graves vistos | Errores graves nuevos |
+|---|---:|---:|---:|---:|
+| Softmax | 0.2589 | 0.3836 | 0.0133 | 0.0228 |
+| CORAL | 0.2644 | 0.4110 | 0.0200 | 0.0502 |
+| CORAL ponderada | 0.2633 | 0.4384 | 0.0189 | 0.0457 |
+| Predictor por perfil | 0.2744 | 0.8630 | 0.0078 | 0.2603 |
+
+En los perfiles nuevos de R2, el respaldo global predice siempre la primera
+clase. Los soportes de clases 1/2/3 son 87/75/57, con recalls 1/0/0 para ese
+predictor; Softmax obtiene 0.747/0.493/0.667. En perfiles vistos, los soportes
+son 562/223/115 y el recall de la segunda clase es 0.610 con el predictor por
+perfil frente a 0.511 con Softmax. Por tanto, el MAE agregado no describe por sí
+solo el comportamiento de cada clase.
+
+La novedad no implica necesariamente mayor error: en R4 los cuatro modelos
+tienen menor MAE en perfiles nuevos. La composición de clases y los soportes
+difieren; no se atribuye causalidad a visto/nuevo. Comparar moda y mediana
+mantiene el aprendizaje, mientras que comparar el predictor por perfil con
+las redes cambia el estimador. La ambigüedad empírica del archivo completo no
+estima un límite poblacional ni una cota de los modelos OOF.
 
 ## Discusión y respuestas mínimas
 
@@ -132,6 +191,13 @@ produjera una mejora automática. Las conclusiones del equipo requieren integrar
 controles, localidad y las extensiones previstas, además de reconocer la
 incertidumbre del instrumento y el escaso soporte de clases extremas.
 
+El análisis de decisiones muestra cambios pequeños y no uniformes en Softmax,
+y que CORAL ya usa una decisión coincidente con la mediana en la corrida
+central. El predictor por perfil describe respuestas vistas pero depende de
+un respaldo global en las nuevas; los recalls y soportes hacen visible ese
+límite. Estos resultados distinguen el efecto de decidir del de aprender y no
+permiten elegir retrospectivamente una regla o arquitectura para futuros datos.
+
 ## Código y reproducibilidad
 
 El núcleo de entrenamiento no se cambió al auditar la corrida central. Se
@@ -144,6 +210,7 @@ no decide épocas, hiperparámetros ni ampliaciones del estudio.
 python -m experimentos.auditar_corrida results/g4_2_central_unweighted --eventos 654
 python -m experimentos.auditar_corrida results/g4_2_central_weighted --eventos 327
 python -m experimentos.comparacion results/g4_2_central_unweighted results/g4_2_central_weighted --output results/resumen/central
+python -m experimentos.analisis --out results/resumen/analisis_reproduccion
 python -m unittest discover -s tests -v
 ```
 

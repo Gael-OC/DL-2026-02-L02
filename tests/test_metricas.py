@@ -1,4 +1,4 @@
-"""Casos del alfabeto completo y de las metricas probabilisticas G3.1."""
+"""Casos del alfabeto completo y de las métricas probabilísticas."""
 
 import unittest
 

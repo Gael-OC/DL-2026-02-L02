@@ -1,9 +1,9 @@
-# 4. Extension ordinal (TODO del alumno)
+# 4. Extension ordinal
 
 El experimento `conv1d_coral` reutiliza todo lo entregado (datos, tronco
 Conv1D, `Trainer`, grid, validacion anidada, metricas y reportes). La perdida,
 los pesos por clase, la cabeza, los niveles y la inferencia ya estan implementados.
-La integracion corta con y sin pesos fue comprobada en GDS_R2.
+Las corridas completas con y sin pesos están disponibles en los seis objetivos.
 
 ## Idea de CORAL
 
@@ -16,7 +16,7 @@ La integracion corta con y sin pesos fue comprobada en GDS_R2.
 - Como todos los umbrales comparten `w`, las probabilidades quedan ordenadas
   (consistencia de rango).
 
-## Funciones y esqueletos
+## Funciones implementadas
 
 | Orden | Archivo | Firma | Formas |
 |---|---|---|---|
@@ -28,12 +28,12 @@ La integracion corta con y sin pesos fue comprobada en GDS_R2.
 | 6 | `src/tasks/ordinal_task.py` | `effective_number_weights(labels, num_classes, beta=0.99)` (implementada) | `(N,) -> (K,)` |
 
 `CoralTask`, `CoralLoss`, `ModelFactory` y `TaskFactory` **ya estan
-conectados** y se comprobaron con corridas cortas de `--algorithm conv1d_coral`.
+conectados** y se evaluaron en las corridas completas de `--algorithm conv1d_coral`.
 
 `Conv1DCoralNet` conecta el tronco compartido con la cabeza CORAL. El sesgo
 inicial y las diferencias positivas garantizan logits decrecientes.
 
-## Pistas
+## Detalles de implementación
 
 - `CoralLayer`: `nn.Linear(input_size, 1, bias=False)` para el puntaje; un
   sesgo inicial y K-2 diferencias positivas con `softplus`; `cumsum` para

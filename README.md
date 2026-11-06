@@ -6,6 +6,8 @@ Avance del 04/11: corrida central completa y auditada (981 ajustes),
 
 El predictor por perfil incluye 6714 predicciones verificadas en los seis
 objetivos. [Resultados y reproducción](results/README.md#predictor-por-perfil).
+El [análisis de decisiones y perfiles](results/resumen/analisis/discusion.md)
+incluye comparaciones pareadas, recalls con soporte y dos figuras regenerables.
 
 **Controles R2 históricos:** las cifras siguientes requieren revisión antes de
 integrarlas a la comparación final. El ejecutor actual usa un solo fold interno,
@@ -55,7 +57,7 @@ con `nn.Conv1d` antes del MLP.
 | Algoritmo | Arquitectura | Perdida | Prediccion | Estado |
 |---|---|---|---|---|
 | `conv1d_softmax` | Conv1D + MLP + `Linear(K)` | `CrossEntropyLoss` | `argmax` | Implementado |
-| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado; integración corta comprobada |
+| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado y evaluado en seis objetivos |
 
 Ambos comparten el mismo tronco (`Conv1DBackbone`). Solo cambia la cabeza y la
 estrategia de entrenamiento (`ClassificationTask`).
@@ -135,14 +137,14 @@ DL-2026-02-L02/
 2. [Arquitectura](docs/02_arquitectura.md): convolucion 1D, trazado de formas,
    clases y responsabilidades.
 3. [Uso](docs/03_uso.md): entorno, argumentos, ejemplos de comandos y salidas.
-4. [Extension ordinal](docs/04_extension_ordinal.md): esqueletos CORAL y orden
-   sugerido de implementacion.
+4. [Extension ordinal](docs/04_extension_ordinal.md): CORAL, pesos por clase y
+   detalles de implementacion.
 
 ## Plan sugerido para alumnos
 
 1. Leer [docs/01_problema.md](docs/01_problema.md) y revisar el dataset.
 2. Ejecutar `conv1d_softmax` en `GDS_R2` con `--no-grid` y luego con grid.
 3. Correr `--all-targets` y revisar `results/` (tablas, rankings, `seleccion_hp.csv`).
-4. Implementar los esqueletos CORAL (ver [docs/04_extension_ordinal.md](docs/04_extension_ordinal.md)).
+4. Revisar la implementación CORAL (ver [docs/04_extension_ordinal.md](docs/04_extension_ordinal.md)).
 5. Ejecutar `--algorithm all` con y sin `--use-weights`.
 6. Completar el informe comparando Softmax y CORAL en los seis objetivos.

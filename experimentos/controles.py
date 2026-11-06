@@ -13,10 +13,6 @@ from src.evaluation.metrics import MetricsCalculator
 from src.config import DEFAULT_RANDOM_SEED
 from src.utils import resolve_device, set_seed
 
-# ---------------------------------------------------------------------------
-# J1.1 & J1.2: Predictores Constantes y Regresión Logística
-# ---------------------------------------------------------------------------
-
 class ConstantPredictor:
     """Predictor constante para líneas base (moda, mediana, distribución previa)."""
     def __init__(self, strategy='mode', classes=None):
@@ -112,10 +108,6 @@ class LogisticControlPredictor:
     def predict_proba(self, X):
         return self.model.predict_proba(self._transform_X(X))
 
-# ---------------------------------------------------------------------------
-# J2.1: MLP Sencilla de Referencia (Lab01)
-# ---------------------------------------------------------------------------
-
 class ShallowMultiClassNet(nn.Module):
     """Red neuronal poco profunda para clasificación multiclase (Lab01)."""
     def __init__(self, input_dim: int = 15, hidden_dim: int = 32, dropout: float = 0.15, output_dim: int = 3) -> None:
@@ -134,7 +126,7 @@ class ShallowMultiClassNet(nn.Module):
 
 
 class MLPControlPredictor:
-    """Control MLP sencilla del Lab01 (Ficha J2.1)."""
+    """Control MLP sencilla del Lab01."""
     def __init__(self, candidates=None, epochs=20, batch_size=32, lr=1e-3, weight_decay=1e-4, seed=DEFAULT_RANDOM_SEED):
         self.candidates = candidates if candidates is not None else [
             {"hidden_dim": 32, "dropout": 0.15},
@@ -170,9 +162,8 @@ class MLPControlPredictor:
                 optimizer.zero_grad()
                 logits = model(inputs)
 
-                # CORRECCIÓN CLAVE: Eliminar dimensiones extra (ej. transformar [16, 1, 3] a [16, 3])
                 if logits.ndim > 2:
-                    logits = logits.squeeze(1) # o logits.reshape(-1, self.num_classes)
+                    logits = logits.squeeze(1)
 
                 loss = criterion(logits, targets)
                 loss.backward()
@@ -188,7 +179,6 @@ class MLPControlPredictor:
         best_score_qwk = float('-inf')
         best_config = self.candidates[0]
 
-        # Búsqueda interna sobre las 4 candidatas exactas de J2.1
         for config in self.candidates:
             set_seed(self.seed)
             model = ShallowMultiClassNet(
@@ -200,7 +190,6 @@ class MLPControlPredictor:
 
             model = self._train_model(model, X_train, y_train, device)
 
-            # Evaluación en validación interna
             model.eval()
             val_dataset = CognitiveSequenceDataset(X_val, np.zeros(len(X_val), dtype=np.int64))
             val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
@@ -211,12 +200,10 @@ class MLPControlPredictor:
                     logits = model(inputs.to(device))
                     if logits.ndim > 2:
                         logits = logits.squeeze(1)
-                    # Obtener estrictamente los índices de clase enteros (B,)
                     preds = torch.argmax(logits, dim=1).cpu().numpy()
                     preds_list.append(preds)
             val_preds = np.concatenate(preds_list)
 
-            # Ahora ambos (y_val y val_preds) tendrán forma (20,)
             mae = MetricsCalculator.mae_ordinal(y_val, val_preds)
             qwk = MetricsCalculator.quadratic_weighted_kappa(y_val, val_preds)
 
@@ -228,7 +215,6 @@ class MLPControlPredictor:
 
         self.best_config = best_config
 
-        # Reentrenamiento final con la mejor configuración seleccionada
         set_seed(self.seed)
         self.best_model = ShallowMultiClassNet(
             input_dim=15,
@@ -270,10 +256,6 @@ class MLPControlPredictor:
             probs_list.append(probs)
         return np.concatenate(probs_list)
 
-
-# ---------------------------------------------------------------------------
-# J2.2: Boosting Tabular (HistGradientBoosting)
-# ---------------------------------------------------------------------------
 
 class HistGradientBoostingControlPredictor:
     """Control HistGradientBoosting con candidatas de max_leaf_nodes (3, 7, 15, 31)."""

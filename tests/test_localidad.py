@@ -1,5 +1,5 @@
 """
-Pruebas unitarias para los modelos de localidad y sus órdenes (J3.1 y J3.2).
+Pruebas para los modelos de localidad y sus órdenes.
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ from experimentos.localidad import (
 class TestLocalidadPanel(unittest.TestCase):
 
     def test_model_shapes_and_parameters(self):
-        # Verificar contenciosos y conteo de parámetros exacto para K=3
         model_k3 = build_locality_model("cnn_k3", num_features=15, num_classes=3)
         model_k1 = build_locality_model("cnn_k1", num_features=15, num_classes=3)
         model_mlp = build_locality_model("mlp_capacity", num_features=15, num_classes=3)
@@ -29,7 +28,6 @@ class TestLocalidadPanel(unittest.TestCase):
         self.assertEqual(params_k3, 17219, f"CNN-k3 tiene {params_k3} parámetros (esperados 17219)")
         self.assertEqual(params_mlp, 17231, f"MLP capacidad tiene {params_mlp} parámetros (esperados 17231)")
 
-        # Comprobar forward pass con formas (B, 15) y (B, 1, 15)
         dummy_flat = torch.randn(8, 15)
         dummy_seq = torch.randn(8, 1, 15)
 
@@ -39,7 +37,6 @@ class TestLocalidadPanel(unittest.TestCase):
                 out_flat = model(dummy_flat)
                 self.assertEqual(out_flat.shape, (8, 3))
                 
-                # Para modelos MLP, aseguramos que manejen formato seq si se pasa
                 if isinstance(model, build_locality_model("mlp_capacity").__class__):
                     out_seq = model(dummy_seq)
                     self.assertEqual(out_seq.shape, (8, 3))
@@ -53,11 +50,9 @@ class TestLocalidadPanel(unittest.TestCase):
         self.assertEqual(len(blocks_indices), 15)
         self.assertEqual(len(global_indices), 15)
 
-        # Comprobar unicidad y rango de índices
         self.assertEqual(len(set(blocks_indices)), 15)
         self.assertEqual(len(set(global_indices)), 15)
 
-        # Probar aplicación sobre arreglo numpy
         X_dummy = np.arange(30).reshape(2, 15)
         X_reordered = apply_order_to_features(X_dummy, "blocks")
         self.assertEqual(X_reordered.shape, (2, 15))

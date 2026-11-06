@@ -32,7 +32,7 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 06/11/2026:** la comparación central, G5.1 y G5.2 están terminadas.
+**Estado al 06/11/2026:** la comparación central y G5.1–G5.3 están terminadas.
 Las tareas posteriores, incluida la integración conjunta,
 conservan su estado del tablero. Se conserva el avance de Johan ya compartido.
 Por decisión de Gael, el cómputo y los artefactos restantes se mantendrán en
@@ -73,7 +73,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
 | [x] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | terminada | 04/11: reglas sobre probabilidades OOF, comparación por fold y equivalencia binaria comprobadas |
 | [x] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | terminada | 06/11: 6714 predicciones, 27 folds, coincidencia exacta con referencia; siete pruebas nuevas y suite de 53 aprobadas |
-| [ ] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | pendiente | — |
+| [x] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | terminada | 06/11: 26856 predicciones alineadas, dos figuras y discusión regenerables; suite de 57 pruebas aprobada |
 | [ ] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | pendiente | — |
 | [ ] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | pendiente | — |
 | [ ] | H5.1 Robustez | Gael | 08/11 | G4.3 | pendiente | — |
@@ -842,6 +842,16 @@ G5.1, G5.2 y resultados obligatorios.
 **Aceptación:** separar cambios de decisión de cambios de aprendizaje y señalar
 que la ambigüedad empírica no es una estimación del límite poblacional.
 
+**Cierre 06/11:** `experimentos/analisis.py` cruza 20142 predicciones de las
+tres redes con 6714 filas del predictor por perfil, verificando cobertura,
+folds, etiquetas, probabilidades y manifiestos de origen. Exporta métricas
+externas y OOF, diferencias pareadas, errores por dirección y recalls con
+soportes. Los recalls sin soporte son no estimables. Dos figuras y la discusión
+están en `results/resumen/analisis/`; el borrador del informe incorpora los
+hallazgos y límites. Cuatro pruebas específicas y suite de 57 aprobadas.
+Los agregados y figuras se regeneraron desde artefactos locales sin entrenar.
+Se conserva el cómputo local y se distingue decisión de aprendizaje.
+
 ### J4.1 — Ejecutar localidad
 
 **Responsable:** Johan. **Fecha:** 06/11. **Duración:** 60–90 min de preparación
@@ -1080,6 +1090,7 @@ prueba corta no convierte un experimento final en terminado.
 | J3.1 | Johan | 03/11: Implementación de CNN-k3 (17,219 parámetros), CNN-k1 y MLP de capacidad próxima (17,231 parámetros) en el módulo de localidad, con pruebas unitarias aprobadas. | J3.2 |
 | J3.2 | Johan | 03/11: Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. | J4.1/J4.2 |
 | G5.2 | Gael | 06/11: predictor reproducible local, 6714 filas y 27 folds, coincidencia exacta con referencia y 53 pruebas aprobadas; manifiesto y agregados conservados | G5.3: figuras y discusión de decisiones/perfiles |
+| G5.3 | Gael | 06/11: análisis pareado, recalls/soportes y dirección del error; dos figuras y discusión regeneradas, 57 pruebas aprobadas | Integrar con controles, localidad y robustez |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas

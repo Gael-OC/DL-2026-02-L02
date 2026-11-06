@@ -112,7 +112,7 @@ python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets
 python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets \
   --rank-metric mae_ordinal --rank-mode min
 
-# 7. Experimento ordinal (requiere completar los TODO)
+# 7. Experimento ordinal
 python main.py --data-path "dataset/15 atributos R0-R5.sav" --algorithm conv1d_coral
 
 # 8. Ordinal con pesos por numero efectivo
