@@ -74,8 +74,8 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | terminada | 04/11: reglas sobre probabilidades OOF, comparación por fold y equivalencia binaria comprobadas |
 | [x] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | terminada | 06/11: 6714 predicciones, 27 folds, coincidencia exacta con referencia; siete pruebas nuevas y suite de 53 aprobadas |
 | [x] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | terminada | 06/11: 26856 predicciones alineadas, dos figuras y discusión regenerables; suite de 57 pruebas aprobada |
-| [ ] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | pendiente | — |
-| [ ] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | pendiente | — |
+| [x] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | terminada | 07/11: ejecución masiva de los 405 ajustes en los modelos CNN-k3, CNN-k1 y MLP de capacidad próxima |
+| [x] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | terminada | 07/11: Graficación y análisis por arquitectura (modelo) y orden de características |
 | [ ] | H5.1 Robustez | Gael | 08/11 | G4.3 | pendiente | — |
 | [ ] | H5.2 Integración de resultados | Gael y Johan | 08/11 | J2.3, G5.3, J4.2, H5.1 | pendiente | — |
 | [ ] | H6.1 Informe completo | Gael y Johan | 10/11 | H5.2 | pendiente | — |
@@ -1091,6 +1091,8 @@ prueba corta no convierte un experimento final en terminado.
 | J3.2 | Johan | 03/11: Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. | J4.1/J4.2 |
 | G5.2 | Gael | 06/11: predictor reproducible local, 6714 filas y 27 folds, coincidencia exacta con referencia y 53 pruebas aprobadas; manifiesto y agregados conservados | G5.3: figuras y discusión de decisiones/perfiles |
 | G5.3 | Gael | 06/11: análisis pareado, recalls/soportes y dirección del error; dos figuras y discusión regeneradas, 57 pruebas aprobadas | Integrar con controles, localidad y robustez |
+| J4.1 | Johan | 07/11: ejecución masiva de los 405 ajustes en los modelos CNN-k3, CNN-k1 y MLP de capacidad próxima, caculando métricas como MAE Ordinal y QWK. | J4.2 |
+| J4.2 | Johan | 07/11: Graficación y análisis por arquitectura (modelo) y orden de características, concluyendo que no hay una diferencia notable entre modelos. | H5.2 |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
