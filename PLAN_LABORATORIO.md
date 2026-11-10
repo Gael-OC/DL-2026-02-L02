@@ -32,7 +32,8 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 06/11/2026:** la comparación central y G5.1–G5.3 están terminadas.
+**Estado al 08/11/2026:** la comparación central, los análisis de decisiones,
+perfiles y robustez, y el estudio de localidad están terminados.
 Las tareas posteriores, incluida la integración conjunta,
 conservan su estado del tablero. Se conserva el avance de Johan ya compartido.
 Por decisión de Gael, el cómputo y los artefactos restantes se mantendrán en
@@ -76,7 +77,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | terminada | 06/11: 26856 predicciones alineadas, dos figuras y discusión regenerables; suite de 57 pruebas aprobada |
 | [x] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | terminada | 07/11: ejecución masiva de los 405 ajustes en los modelos CNN-k3, CNN-k1 y MLP de capacidad próxima |
 | [x] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | terminada | 07/11: Graficación y análisis por arquitectura (modelo) y orden de características |
-| [ ] | H5.1 Robustez | Gael | 08/11 | G4.3 | pendiente | — |
+| [x] | H5.1 Robustez | Gael | 08/11 | G4.3 | terminada | 08/11: 780 ajustes existentes auditados; comparación de tres particiones y selección en `results/resumen/robustez/` |
 | [ ] | H5.2 Integración de resultados | Gael y Johan | 08/11 | J2.3, G5.3, J4.2, H5.1 | pendiente | — |
 | [ ] | H6.1 Informe completo | Gael y Johan | 10/11 | H5.2 | pendiente | — |
 | [ ] | H6.2 Reproducción | Gael y Johan | 10/11 | H6.1 | pendiente | — |

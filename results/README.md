@@ -111,6 +111,16 @@ comparar una red con frecuencias por perfil cambia el estimador. La ambigüedad
 del archivo no estima un límite poblacional. Cuatro pruebas específicas y la
 suite completa de 57 pruebas aprobaron en la verificación del 06/11/2026.
 
+## Robustez entre particiones
+
+El análisis reutiliza las ocho corridas locales de `h5_robustez/`, con 780 ajustes
+adicionales, y la referencia central. Desde `lab_pytorch`, ejecutar
+`python -m experimentos.robustez` con `results/resumen/robustez/` vacío. Audita
+las diez carpetas, coteja código, datos y particiones pareadas y produce
+[resultados y discusión](resumen/robustez/robustez.md), métricas por partición,
+frecuencias de selección, diferencias OOF y hashes de origen. No reentrena.
+Las particiones comparten pacientes y sus resultados son descriptivos.
+
 ## Regeneración y entorno
 
 Activar `lab_pytorch` y ejecutar desde la raíz del repositorio. Para limitar

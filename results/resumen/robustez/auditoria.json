@@ -1,0 +1,57 @@
+{
+  "ajustes_adicionales": 780,
+  "corridas": [
+    {
+      "ruta": "results/g4_2_central_unweighted",
+      "eventos": 654,
+      "manifest_sha256": "c2be43b1d72c3df9dc871723a010dc50bf52d41e80f63ae9741a4e9607360286"
+    },
+    {
+      "ruta": "results/g4_2_central_weighted",
+      "eventos": 327,
+      "manifest_sha256": "8b76b4da3d0298cf4740e46762915de2f1144883dde7b169542dce2ff48ef7b8"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R1_split314_unweighted",
+      "eventos": 130,
+      "manifest_sha256": "8b515fa4c4a704e786e497cb6b5ef4157867560d9131e9c4f363bf89db68abf8"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R1_split314_weighted",
+      "eventos": 65,
+      "manifest_sha256": "9c5018d92820deb32c77317d2008a0d40bafe8a1e1bf989541fefd62074c3da9"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R1_split2718_unweighted",
+      "eventos": 130,
+      "manifest_sha256": "6f03b81529c432c1d5ef28e4c52dee6c5e4958fae7ae7005159961fd9b5862b7"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R1_split2718_weighted",
+      "eventos": 65,
+      "manifest_sha256": "89f0059372c491fb03a37b713110766fdaf7893edc1a3eb3e265bdabc222a7c6"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R2_split314_unweighted",
+      "eventos": 130,
+      "manifest_sha256": "fa5f25dc195ce805e28f70de8ac3efb3bf51baf0c95e2965eced14c9c169047d"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R2_split314_weighted",
+      "eventos": 65,
+      "manifest_sha256": "4aea960edad240dbd7be1faac424b7327f648f86039ead94b32773ce081cbed1"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R2_split2718_unweighted",
+      "eventos": 130,
+      "manifest_sha256": "033b7ebdf900d5e6a7af01688bf632209fb2a4bba07b5a693557b4bce05ad982"
+    },
+    {
+      "ruta": "results/h5_robustez/GDS_R2_split2718_weighted",
+      "eventos": 65,
+      "manifest_sha256": "a2076269f80691d17e001b08621525b6244c404691ed33d4749e95aa031f4e79"
+    }
+  ],
+  "data_sha256": "b454a4e5c997be26edb3a187605c2c10da1147ac1ce6cea76d42adbe68b17474",
+  "code_sha256": "8e42a526571734420ae0cb554265e5fefcdba5ebf481b0234266610e243a773c"
+}
