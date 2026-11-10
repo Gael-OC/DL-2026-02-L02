@@ -65,7 +65,7 @@ Todos los comandos se ejecutan desde la raiz del repositorio.
 | `--outer-folds` | `5` | Folds externos (reporte) |
 | `--inner-folds` | `3` | Folds internos (seleccion) |
 | `--gds-outer-folds` | `2` | Folds externos de `GDS` con `--all-targets` |
-| `--gds-inner-folds` | `2` | Folds internos de `GDS` con `--all-targets` |
+| `--gds-inner-folds` | `2` | Argumento heredado; la búsqueda interna de GDS se omite por protocolo |
 | `--no-grid` | off | No recorre el grid: usa solo la configuracion base |
 
 ### Ejecucion y reportes
@@ -92,7 +92,7 @@ se ejecuta para informar el MAE interno.
 
 ```bash
 # 1. Verificar el entorno (rapido, sin grid)
-python main.py --data-path "dataset/15 atributos R0-R5.sav" --epochs 5 --no-grid
+python main.py --data-path "dataset/15 atributos R0-R5.sav" --algorithm all --epochs 1 --no-grid --outer-folds 2 --inner-folds 2 --output-dir results/prueba_entorno
 
 # 2. Experimento completo en GDS_R2 (grid + 5x3)
 python main.py --data-path "dataset/15 atributos R0-R5.sav" --target-name GDS_R2
@@ -123,9 +123,9 @@ python main.py --data-path "dataset/15 atributos R0-R5.sav" --algorithm conv1d_c
 python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets --algorithm all
 ```
 
-Mientras los esqueletos CORAL no esten completos, `conv1d_coral` se omite con
-un mensaje `NotImplementedError` que indica el archivo a completar; con
-`--algorithm all` los resultados de `conv1d_softmax` se reportan igual.
+Softmax, CORAL y CORAL ponderada están implementados. Cada comando de
+entrenamiento necesita su propio `--output-dir results/NOMBRE_CORRIDA`; no usar
+la raíz `results/`, que contiene documentación y agregados.
 
 ## Que se ve en consola
 
@@ -187,9 +187,14 @@ reportes regenerables de cada variante.
 | `barras_f1.png`, `barras_mae.png` | Barras por objetivo y algoritmo |
 | `confusion_<algoritmo>_<objetivo>.png` | Matriz del ultimo fold externo |
 
-## Tiempos de referencia
+## Reconstrucción de los estudios
 
-En CPU, un objetivo con grid (4 configuraciones x 3 folds internos + 1
-reentrenamiento, por 5 folds externos, 20 epocas) toma alrededor de 1 minuto
-por algoritmo. `--all-targets` con un algoritmo toma del orden de 5–8 minutos.
-Para depurar use `--epochs 5 --no-grid`.
+El [README principal](../README.md#reproducir-la-comparación-obligatoria) contiene
+los comandos centrales. La [guía de resultados](../results/README.md) cubre
+controles, constantes, decisiones, perfiles, localidad y robustez, distinguiendo
+regeneración de agregados y reentrenamiento.
+
+Los manifiestos conservan las versiones originales de cada corrida.
+La reproducción desde otro entorno se revisará en H6.2; no se promete igualdad
+bit a bit entre dispositivos. Para limitar CPU usar
+`OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1`.

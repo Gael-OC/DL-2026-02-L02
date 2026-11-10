@@ -26,6 +26,7 @@ class MLPCapacityNet(nn.Module):
         self.fc3 = nn.Linear(115, num_classes)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        # Asegurar forma (B, 15) si llega como (B, 1, 15)
         if inputs.ndim == 3 and inputs.size(1) == 1:
             inputs = inputs.squeeze(1)
         x = self.relu1(self.fc1(inputs))

@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import HistGradientBoostingClassifier
 
@@ -12,6 +12,10 @@ from src.data.dataset import CognitiveSequenceDataset
 from src.evaluation.metrics import MetricsCalculator
 from src.config import DEFAULT_RANDOM_SEED
 from src.utils import resolve_device, set_seed
+
+# ---------------------------------------------------------------------------
+# Predictores constantes y regresión logística
+# ---------------------------------------------------------------------------
 
 class ConstantPredictor:
     """Predictor constante para líneas base (moda, mediana, distribución previa)."""
@@ -108,6 +112,10 @@ class LogisticControlPredictor:
     def predict_proba(self, X):
         return self.model.predict_proba(self._transform_X(X))
 
+# ---------------------------------------------------------------------------
+# MLP sencilla de referencia (Lab01)
+# ---------------------------------------------------------------------------
+
 class ShallowMultiClassNet(nn.Module):
     """Red neuronal poco profunda para clasificación multiclase (Lab01)."""
     def __init__(self, input_dim: int = 15, hidden_dim: int = 32, dropout: float = 0.15, output_dim: int = 3) -> None:
@@ -147,7 +155,7 @@ class MLPControlPredictor:
         set_seed(self.seed)
 
         y_tr_long = np.asarray(y_tr, dtype=np.int64)
-        dataset = CognitiveSequenceDataset(X_tr, y_tr_long)
+        dataset = TensorDataset(torch.as_tensor(X_tr, dtype=torch.float32), torch.as_tensor(y_tr_long))
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         criterion = nn.CrossEntropyLoss()
@@ -162,8 +170,9 @@ class MLPControlPredictor:
                 optimizer.zero_grad()
                 logits = model(inputs)
 
+                # CORRECCIÓN CLAVE: Eliminar dimensiones extra (ej. transformar [16, 1, 3] a [16, 3])
                 if logits.ndim > 2:
-                    logits = logits.squeeze(1)
+                    logits = logits.squeeze(1) # o logits.reshape(-1, self.num_classes)
 
                 loss = criterion(logits, targets)
                 loss.backward()
@@ -173,12 +182,13 @@ class MLPControlPredictor:
 
     def fit_grid_search(self, X_train, y_train, X_val, y_val, classes):
         self.num_classes = len(classes)
-        device = resolve_device("auto")
+        device = torch.device("cpu")
 
         best_score_mae = float('inf')
         best_score_qwk = float('-inf')
         best_config = self.candidates[0]
 
+        # Búsqueda interna sobre las cuatro candidatas de hiperparámetros.
         for config in self.candidates:
             set_seed(self.seed)
             model = ShallowMultiClassNet(
@@ -190,8 +200,9 @@ class MLPControlPredictor:
 
             model = self._train_model(model, X_train, y_train, device)
 
+            # Evaluación en validación interna
             model.eval()
-            val_dataset = CognitiveSequenceDataset(X_val, np.zeros(len(X_val), dtype=np.int64))
+            val_dataset = TensorDataset(torch.as_tensor(X_val, dtype=torch.float32), torch.zeros(len(X_val), dtype=torch.long))
             val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
             preds_list = []
@@ -200,10 +211,12 @@ class MLPControlPredictor:
                     logits = model(inputs.to(device))
                     if logits.ndim > 2:
                         logits = logits.squeeze(1)
+                    # Obtener estrictamente los índices de clase enteros (B,)
                     preds = torch.argmax(logits, dim=1).cpu().numpy()
                     preds_list.append(preds)
             val_preds = np.concatenate(preds_list)
 
+            # Ahora ambos (y_val y val_preds) tendrán forma (20,)
             mae = MetricsCalculator.mae_ordinal(y_val, val_preds)
             qwk = MetricsCalculator.quadratic_weighted_kappa(y_val, val_preds)
 
@@ -215,6 +228,7 @@ class MLPControlPredictor:
 
         self.best_config = best_config
 
+        # Reentrenamiento final con la mejor configuración seleccionada
         set_seed(self.seed)
         self.best_model = ShallowMultiClassNet(
             input_dim=15,
@@ -229,7 +243,7 @@ class MLPControlPredictor:
     def predict(self, X):
         device = next(self.best_model.parameters()).device
         self.best_model.eval()
-        dataset = CognitiveSequenceDataset(X, np.zeros(len(X), dtype=np.int64))
+        dataset = TensorDataset(torch.as_tensor(X, dtype=torch.float32), torch.zeros(len(X), dtype=torch.long))
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
         preds_list = []
         for inputs, _ in loader:
@@ -244,7 +258,7 @@ class MLPControlPredictor:
     def predict_proba(self, X):
         device = next(self.best_model.parameters()).device
         self.best_model.eval()
-        dataset = CognitiveSequenceDataset(X, np.zeros(len(X), dtype=np.int64))
+        dataset = TensorDataset(torch.as_tensor(X, dtype=torch.float32), torch.zeros(len(X), dtype=torch.long))
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
         probs_list = []
         softmax = nn.Softmax(dim=1)
@@ -256,6 +270,10 @@ class MLPControlPredictor:
             probs_list.append(probs)
         return np.concatenate(probs_list)
 
+
+# ---------------------------------------------------------------------------
+# Boosting tabular (HistGradientBoosting)
+# ---------------------------------------------------------------------------
 
 class HistGradientBoostingControlPredictor:
     """Control HistGradientBoosting con candidatas de max_leaf_nodes (3, 7, 15, 31)."""

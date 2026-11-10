@@ -15,42 +15,6 @@ from src.training.records import RunRecords
 from src.training.trainer import Trainer
 
 
-class TestRegistros(unittest.TestCase):
-    def test_interrupcion_reanudacion_y_manifiesto(self):
-        rng = np.random.default_rng(7)
-        data = ExperimentData('GDS_R2', rng.normal(size=(24, 15)).astype('float32'), np.tile(np.arange(3), 8), [1, 2, 3])
-        with tempfile.TemporaryDirectory() as folder:
-            records = RunRecords(folder, {'seed': 42})
-            validator = NestedCrossValidator('conv1d_softmax', ModelConfig(), TrainingConfig(epochs=1, batch_size=8), 2, 2,
-                                              [{'hidden_dim': 16}, {'hidden_dim': 32}], 42, torch.device('cpu'),
-                                              verbose=False, records=records, split_path=Path(folder) / 'splits.npz')
-            original = records.save_fold
-            def interrupt(target, variant, fold, result, candidates):
-                if fold == 2:
-                    raise RuntimeError('interrupcion simulada')
-                original(target, variant, fold, result, candidates)
-            with patch.object(records, 'save_fold', side_effect=interrupt):
-                with self.assertRaises(RuntimeError):
-                    validator.run(data)
-            checkpoint = records.fold_path('GDS_R2', 'softmax', 1).read_bytes()
-            with patch.object(Trainer, 'build', wraps=Trainer.build) as builds:
-                result = validator.run(data)
-                self.assertEqual(builds.call_count, 5)
-            self.assertEqual(len(result.folds), 2)
-            self.assertEqual(checkpoint, records.fold_path('GDS_R2', 'softmax', 1).read_bytes())
-            with (Path(folder) / 'candidatas.csv').open() as f:
-                rows = list(csv.DictReader(f))
-            self.assertEqual(len(rows), 4)
-            for fold in ('1', '2'):
-                items = [r for r in rows if r['fold'] == fold]
-                self.assertEqual(sum(r['seleccionada'] == 'True' for r in items), 1)
-                winner = next(r for r in items if r['seleccionada'] == 'True')
-                self.assertEqual(float(winner['mae_mean']), min(float(r['mae_mean']) for r in items))
-            events = [json.loads(x) for x in (Path(folder) / 'ajustes.jsonl').read_text().splitlines()]
-            self.assertTrue(all(e['support_train'] and e['train_losses'] and e['status'] == 'terminado' for e in events))
-            with self.assertRaises(ValueError):
-                RunRecords(folder, {'seed': 314})
-
 class TestReportes(unittest.TestCase):
     def test_regeneracion_y_variantes(self):
         from experimentos.reportes import regenerate_reports

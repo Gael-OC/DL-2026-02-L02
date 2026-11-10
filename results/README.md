@@ -1,135 +1,163 @@
-# Resultados
+# Resultados y reproducción
 
-Las corridas completas se conservan localmente y quedan ignoradas por Git:
-manifiestos, ajustes, splits, predicciones individuales, probabilidades y logs.
-No añadir archivos por fila ni el SAV al repositorio. Se versionan únicamente
-los agregados seleccionados de `resumen/`; el CSV histórico de controles ya
-versionado se conserva y requiere revisión del protocolo antes de integrarlo.
+`resumen/` contiene tablas, figuras y auditorías agregadas. Las corridas
+completas, el SAV, splits, logits y predicciones individuales se conservan
+localmente y están excluidos de Git. El [mapa de evidencia](../docs/resultados.md)
+relaciona estos resultados con los requisitos del laboratorio.
+
+Todos los comandos se ejecutan desde la raíz con `lab_pytorch` activo y
+`OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1`.
 
 ## Comparación central
 
-`g4_2_central_unweighted/` contiene Softmax y CORAL; `g4_2_central_weighted/`,
-CORAL ponderada. Entre ambas hay 18 combinaciones y 981 ajustes. Las seis
-tablas, confusiones OOF y frecuencias del grid están en
-[resumen/central/](resumen/central/), con [tablas legibles](resumen/central/comparacion.md).
+- `g4_2_central_unweighted/`: Softmax y CORAL; 654 ajustes.
+- `g4_2_central_weighted/`: CORAL ponderada; 327 ajustes.
+- [Seis tablas](resumen/central/comparacion.md), nueve métricas y NLL/RPS.
+- [Configuraciones elegidas](resumen/central/configuraciones.csv) y confusiones
+  OOF de todos los folds, con clases originales identificadas.
 
 ```bash
-python -m experimentos.auditar_corrida results/g4_2_central_unweighted --eventos 654
-python -m experimentos.auditar_corrida results/g4_2_central_weighted --eventos 327
-python -m experimentos.comparacion results/g4_2_central_unweighted results/g4_2_central_weighted --output results/resumen/central
+python -m experimentos.auditar_corrida results/g4_2_central_unweighted --eventos 654 --data-path "dataset/15 atributos R0-R5.sav"
+python -m experimentos.auditar_corrida results/g4_2_central_weighted --eventos 327 --data-path "dataset/15 atributos R0-R5.sav"
+python -m experimentos.comparacion results/g4_2_central_unweighted results/g4_2_central_weighted --output results/regeneracion/central
 ```
 
-La auditoría es de solo lectura. La comparación genera únicamente agregados;
-no vuelve a entrenar. El resumen externo usa media y desviación con `ddof=0`;
-no equivale al agregado de todas las filas OOF. GDS usa dos folds externos y
-configuración base con búsqueda omitida. Las cinco recodificaciones usan 5×3
-folds y cuatro candidatas. NLL y RPS complementan las nueve métricas exigidas.
+La auditoría es de solo lectura y valida el hash del SAV, incluidos traslados
+con `--data-path`. La comparación escribe agregados sin entrenar. El resumen
+principal usa media y desviación externa (`ddof=0`), separadas del agregado de
+filas OOF. GDS usa dos externos y configuración base sin búsqueda interna;
+las cinco recodificaciones usan 5×3 y cuatro candidatas.
+
+Para reconstruir las corridas desde cero, usar los dos comandos de
+[entrenamiento central](../README.md#reproducir-la-comparación-obligatoria).
+`python -m experimentos.reportes CARPETA` regenera las exportaciones de una
+corrida conservada. Las confusiones históricas rotuladas como último fold no
+representan todos los folds; para interpretar resultados usar las OOF agregadas.
+
+## Controles R2 y constantes
+
+Los [controles corregidos](resumen/controles/comparacion.md) reutilizan los
+splits centrales. Los cuatro modelos tienen cuatro candidatas evaluadas en
+las tres validaciones internas y un refit externo completo: 260 ajustes.
+La MLP utiliza 20 épocas. Los [resúmenes completos](resumen/controles/resumen.json)
+incluyen las nueve métricas y NLL/RPS, por folds y OOF por separado.
+
+```bash
+# Auditar registros y reconstruir agregados; no entrena.
+python -m experimentos.ejecutar_controles --report-only --output-dir results/controles_validacion --summary-dir results/regeneracion/controles
+
+# Reconstruir los 260 ajustes si no se conservan sus artefactos.
+python -m experimentos.ejecutar_controles --data-path "dataset/15 atributos R0-R5.sav" --output-dir results/nuevos_controles --summary-dir results/nuevos_controles_resumen
+
+# Moda y mediana constantes: solo cuentan etiquetas de train externo.
+python -m experimentos.constantes --out results/regeneracion/constantes
+```
+
+Las [constantes de seis objetivos](resumen/constantes/resumen_folds.csv) usan
+los índices 0..K−1 y no llevan suavizado. El desempate elige la clase menor.
+Sus tablas cubren 27 folds; [OOF](resumen/constantes/oof.csv) se informa aparte.
+El ejecutor y la tabla histórica de `results/controles/` no son la referencia
+para la comparación final; no mezclar esas cifras con los controles corregidos.
 
 ## Decisiones por moda y mediana
 
-`python -m experimentos.decisiones` reutiliza las probabilidades de las
-corridas centrales sin entrenar modelos. Guarda agregados por fold y OOF en
-`resumen/decisiones/`; las predicciones individuales permanecen locales.
+```bash
+python -m experimentos.decisiones --local results/regeneracion/decisiones_local --out results/regeneracion/decisiones
+```
+
+Reutiliza las probabilidades centrales, sin entrenamientos. Exporta métricas
+por fold, media/std, OOF y diferencias pareadas en `resumen/decisiones/` cuando
+se usa la salida predeterminada. `--unweighted` y `--weighted` permiten cambiar
+las rutas de las corridas fuente. Las filas individuales quedan en `--local`.
 
 ## Predictor por perfil
 
-El cómputo y los artefactos se mantienen en local.
-`experimentos.perfiles` usa las 15 respuestas en su orden docente y no
-elimina perfiles repetidos. Cuenta etiquetas solo del entrenamiento externo:
-`p(c|perfil) = (n_c + 1) / (n_perfil + K)`. Un perfil nuevo usa los conteos
-globales de ese entrenamiento con el mismo suavizado. Moda y mediana inferior
-reutilizan las reglas de decisiones; los empates eligen el índice menor.
-
-Corrida completada el 06/11/2026, desde la raíz y con `lab_pytorch` activo:
+El predictor cuenta etiquetas de las 15 respuestas exactas en train externo:
+`p(c|perfil) = (n_c + 1) / (n_perfil + K)`. Para un perfil nuevo usa los conteos
+globales de ese entrenamiento con el mismo suavizado. No elimina respuestas
+repetidas ni usa el ID como entrada.
 
 ```bash
-python -m experimentos.perfiles --data-path 'dataset/15 atributos R0-R5.sav' --splits-dir results/g4_2_central_unweighted --local results/g5_2_perfiles --out results/resumen/perfiles --reference results/g5_perfiles/filas.csv
-python -m unittest discover -s tests -p 'test_perfiles.py' -v
-python -m unittest discover -s tests -v
+python -m experimentos.perfiles --data-path "dataset/15 atributos R0-R5.sav" --splits-dir results/g4_2_central_unweighted --local results/regeneracion/perfiles_local --out results/regeneracion/perfiles
 ```
 
-Se verificaron 6714 predicciones (1119 por objetivo), 27 folds externos y
-coincidencia exacta con las filas previas del modelo `perfil`. Siete pruebas
-específicas y la suite de 53 pruebas aprobaron. No se entrenan redes: GDS
-reutiliza dos folds y las cinco recodificaciones, cinco cada una, con semilla 42.
-La marca visto/nuevo corresponde a cada entrenamiento externo: 5406 filas
-vistas y 1308 nuevas entre los seis objetivos; no son personas adicionales.
+Usar carpetas nuevas o vacías. La salida individual incluye filas y manifiesto;
+la agregada incluye [métricas por fold](resumen/perfiles/folds.csv),
+[media/std externa](resumen/perfiles/resumen_folds.csv),
+[OOF](resumen/perfiles/oof.csv) y [auditoría](resumen/perfiles/auditoria.json).
+Son 6714 predicciones, 27 folds y seis objetivos.
 
-- `g5_2_perfiles/filas.csv`: predicciones individuales, probabilidades, decisiones
-  y marca visto/nuevo; permanece ignorado por Git junto al manifiesto local.
-- `g5_2_perfiles/manifest.json`: clases originales, orden de entradas, versiones,
-  rutas y hashes de datos, fuentes, manifiesto central, splits y referencia.
-- [folds.csv](resumen/perfiles/folds.csv): métricas por objetivo/fold/regla.
-- [resumen_folds.csv](resumen/perfiles/resumen_folds.csv): media y desviación
-  externa `ddof=0`, con cantidad de folds válidos por métrica.
-- [oof.csv](resumen/perfiles/oof.csv): métricas sobre todas las filas externas
-  de cada objetivo, diferenciadas del promedio de folds.
-- [auditoria.json](resumen/perfiles/auditoria.json): cobertura, comparación
-  con referencia y hash del manifiesto local de origen; solo agregados.
-
-Para repetir, elegir carpetas de salida nuevas o vacías con `--local` y
-`--out`; el ejecutor rechaza carpetas con archivos. `--reference` es opcional
-para una reproducción sin el CSV histórico; al especificarlo exige igualdad
-exacta antes de escribir salidas. El SAV y los splits deben corresponder a la
-corrida central. Las salidas anteriores se conservan.
+Para cotejar con el CSV histórico conservado se puede añadir
+`--reference results/g5_perfiles/filas.csv`. Se exige coincidencia exacta del
+modelo `perfil`; este archivo es opcional y no viene en Git.
 
 ## Análisis de decisiones y perfiles
 
-Desde el entorno `lab_pytorch`, el análisis se reconstruye con:
-
 ```bash
-python -m experimentos.analisis
-python -m unittest discover -s tests -p 'test_analisis.py' -v
+python -m experimentos.analisis --decisions-path results/regeneracion/decisiones_local/filas.csv --profiles results/regeneracion/perfiles_local --out results/regeneracion/analisis
 ```
 
-El comando valida 20142 predicciones de las redes y 6714 del predictor por
-perfil contra los folds centrales y sus manifiestos. Las comparaciones usan
-las mismas filas y probabilidades, conservando el dtype original al comprobar
-moda/mediana. No entrena modelos. Usa `--out CARPETA_NUEVA` para regenerar sin
-sobrescribir resultados. Los argumentos `--decisions-path`, `--profiles`,
-`--unweighted` y `--weighted` permiten indicar otros artefactos compatibles.
+Valida 20142 predicciones de redes y 6714 de perfiles contra los folds y
+manifiestos fuente, conservando el dtype al comprobar moda/mediana.
+`--unweighted` y `--weighted` permiten apuntar a otras corridas compatibles.
+No entrena y exige una salida nueva o vacía.
 
-Los agregados de `resumen/analisis/` incluyen métricas por fold, media/std
-externa y OOF separados; diferencias mediana−moda y respecto de la decisión
-original; error firmado (predicción−verdad), tasas de subestimación y
-sobreestimación y errores graves por dirección. `recall_clases.csv` distingue
-nivel fold/OOF e incluye clase original y soporte; un recall sin soporte queda
-vacío, no se sustituye por cero. Los grupos `todos`, `visto` y `nuevo` se
-definen con la marca del entrenamiento externo del predictor por perfil.
+- [Discusión](resumen/analisis/discusion.md): comparaciones por pares y límites.
+- [Decisiones](resumen/analisis/decisiones.png): diferencias mediana−moda por fold.
+- [Perfiles](resumen/analisis/perfiles.png): MAE OOF con mediana prefijada y soporte.
+- [Recall por clase](resumen/analisis/recall_clases.csv): nivel fold/OOF,
+  clase original y soporte; sin soporte se declara no estimable.
+- [Auditoría](resumen/analisis/auditoria.json): cobertura y hashes de origen.
 
-- [Discusión y tablas seleccionadas](resumen/analisis/discusion.md).
-- [Cambios pareados de decisión](resumen/analisis/decisiones.png): puntos por
-  fold y media externa; delta negativo indica menor MAE con mediana.
-- [Errores por perfiles vistos/nuevos](resumen/analisis/perfiles.png): MAE OOF
-  con mediana común prefijada y soporte de cada grupo.
-- [Auditoría de origen](resumen/analisis/auditoria.json): hashes de entradas
-  y fuentes; los archivos del análisis no incluyen predicciones individuales.
+Error firmado significa predicción−verdad; negativo indica subestimación.
+Visto/nuevo indica presencia del perfil en train, no identidad de la persona.
+Las diferencias son descriptivas y no permiten elegir retrospectivamente una
+regla usando el test.
 
-Las diferencias son descriptivas: no se escoge una regla con test ni se tratan
-folds como muestras independientes. Cambiar una decisión mantiene el modelo;
-comparar una red con frecuencias por perfil cambia el estimador. La ambigüedad
-del archivo no estima un límite poblacional. Cuatro pruebas específicas y la
-suite completa de 57 pruebas aprobaron en la verificación del 06/11/2026.
+## Localidad y orden
+
+El [panel completo](resumen/localidad/completo/interpretacion.md) tiene
+405 ajustes: tres modelos × tres órdenes × tres particiones × tres
+inicializaciones × cinco folds. Cada una de las 81 condiciones conserva
+1119 predicciones OOF. No utiliza búsqueda interna.
+
+```bash
+# Verificar y regenerar las métricas/figura desde los 405 folds conservados.
+python -m experimentos.ejecutar_localidad --report-only --data-path "dataset/15 atributos R0-R5.sav"
+
+# En un equipo sin artefactos: prueba de nueve condiciones y panel completo.
+python -m experimentos.ejecutar_localidad --smoke --data-path "dataset/15 atributos R0-R5.sav"
+python -m experimentos.ejecutar_localidad --data-path "dataset/15 atributos R0-R5.sav"
+```
+
+Las salidas individuales están en `localidad/preflight/` y `localidad/completo/`;
+los agregados, en `resumen/localidad/` bajo los mismos nombres. No publicar
+las salidas de preflight como resultados finales. El manifiesto coteja código,
+datos, órdenes y protocolo antes de reutilizar un fold.
+
+La [comparación pareada](resumen/localidad/completo/comparacion_pareada.csv)
+conserva semillas y orden. [OOF por condición](resumen/localidad/completo/oof_condiciones.csv)
+y [media/std de sus cinco folds](resumen/localidad/completo/resumen_folds.csv)
+son estadísticos diferentes. La figura muestra ambas fuentes de variación.
 
 ## Robustez entre particiones
 
-El análisis reutiliza las ocho corridas locales de `h5_robustez/`, con 780 ajustes
-adicionales, y la referencia central. Desde `lab_pytorch`, ejecutar
-`python -m experimentos.robustez` con `results/resumen/robustez/` vacío. Audita
-las diez carpetas, coteja código, datos y particiones pareadas y produce
-[resultados y discusión](resumen/robustez/robustez.md), métricas por partición,
-frecuencias de selección, diferencias OOF y hashes de origen. No reentrena.
-Las particiones comparten pacientes y sus resultados son descriptivos.
+[Resultados](resumen/robustez/robustez.md) de R1/R2 en particiones 42, 314 y
+2718, con inicialización base 42. Los 780 ajustes adicionales están en las
+ocho carpetas locales `h5_robustez/`. Para reconstruirlas sin artefactos:
 
-## Regeneración y entorno
+```bash
+for target in GDS_R1 GDS_R2; do
+  for split in 314 2718; do
+    python main.py --data-path "dataset/15 atributos R0-R5.sav" --target-name "$target" --algorithm all --split-seed "$split" --init-seed 42 --output-dir "results/h5_robustez/${target}_split${split}_unweighted"
+    python main.py --data-path "dataset/15 atributos R0-R5.sav" --target-name "$target" --algorithm conv1d_coral --use-weights --split-seed "$split" --init-seed 42 --output-dir "results/h5_robustez/${target}_split${split}_weighted"
+  done
+done
 
-Activar `lab_pytorch` y ejecutar desde la raíz del repositorio. Para limitar
-recursos, usar `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1`.
-Las corridas se pueden retomar con el comando original y el mismo manifiesto;
-no mezclar código/configuración distintos dentro de una carpeta existente.
-La auditoría requiere acceso al SAV original cuyo hash figura en el manifiesto.
+# Audita las diez carpetas y regenera resúmenes sin reentrenar.
+python -m experimentos.robustez --out results/regeneracion/robustez --data-path "dataset/15 atributos R0-R5.sav"
+```
 
-`python -m experimentos.reportes CARPETA` reconstruye exportaciones OOF y
-reportes de una corrida completa, sin entrenamiento. Las confusiones OOF
-agregadas son la referencia; las imágenes históricas de `main.py` rotuladas
-como último fold no representan todos los folds.
+Los folds y particiones comparten observaciones: no son réplicas independientes
+ni se selecciona una semilla ganadora. Las frecuencias del grid y las diferencias
+OOF se conservan separadas de la dispersión entre folds.

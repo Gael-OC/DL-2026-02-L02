@@ -1,0 +1,151 @@
+{
+  "data_sha256": "b454a4e5c997be26edb3a187605c2c10da1147ac1ce6cea76d42adbe68b17474",
+  "code_sha256": {
+    "experimentos/ejecutar_localidad.py": "547e20da6bfb567cfb17319e7edba50893fab3b92beccc62722d8131ecd7470f",
+    "experimentos/localidad.py": "f740faa25864798c9f00e22ec4693515718e2ff0fc247c7e03b6e8d196d7ccda",
+    "src/models/conv_softmax.py": "86dc8e22730afeb58c16438ee7103561cb539e76d490e8c98d274ce40ac13748",
+    "src/models/blocks.py": "a6c0c7610163d25bfc26641064af91e2fe86a9d6b757ebc0c7ab1fda1667ad28",
+    "src/config.py": "c8e58c94c3ad2a0da045a02e9b7ebaba7ed08a9d689b3188f28806979b09598a",
+    "src/training/trainer.py": "d44f8039e33149309ac26a39a943f78fada843916c7032a8911eb7103a2854e3",
+    "src/tasks/softmax_task.py": "c75bed82607ced8e9db19225a7962ecd86a2d525b9468674ed48ba4936de19ef",
+    "src/tasks/base.py": "35b759f8df067782ddffb29fcefc0d53685c5507166a56ee962df4a241a40b30",
+    "src/data/loader.py": "90a94f0117dcf0aa32b5ac8ef35d10218c4e64fc8c0d2e2c37064f654199d292",
+    "src/data/preprocessing.py": "f9ab507184dc7514c22dafb3579665b8e72f3db851641a046439cfdf4f17a405",
+    "src/data/dataset.py": "e19dc9fc6c4923fc7e02829ffb478e34a4f33ad1f6ef142352246af74f990261",
+    "src/evaluation/metrics.py": "36f6104e0822d2573c9fc1fc3c7b5ac773e84d04ff29f189f906ddee624cc558",
+    "src/utils.py": "bbe77138fe7534ea0c6f456a4d79d80bba87eaa29d5dbfa28a72f8bcce76b617"
+  },
+  "epochs": 20,
+  "target": "GDS_R2",
+  "classes": [
+    1,
+    2,
+    3
+  ],
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "batch_size": 32,
+  "device": "cpu",
+  "threads": 1,
+  "inner_folds": 0,
+  "grid": false,
+  "seed_rule": "init_seed + 1000 * fold (one-based); same for all models and orders",
+  "orders": {
+    "original": {
+      "indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "names": [
+        "Día",
+        "Mes",
+        "Año",
+        "Estación",
+        "País",
+        "Ciudad",
+        "CalleLugar",
+        "NumeroPiso",
+        "Miguel2",
+        "González2",
+        "Avenida2",
+        "Imperial2",
+        "A682",
+        "Caldera2",
+        "Copiapo2"
+      ]
+    },
+    "blocks": {
+      "indices": [
+        3,
+        1,
+        0,
+        2,
+        4,
+        5,
+        6,
+        7,
+        9,
+        13,
+        14,
+        12,
+        8,
+        10,
+        11
+      ],
+      "names": [
+        "Estación",
+        "Mes",
+        "Día",
+        "Año",
+        "País",
+        "Ciudad",
+        "CalleLugar",
+        "NumeroPiso",
+        "González2",
+        "Caldera2",
+        "Copiapo2",
+        "A682",
+        "Miguel2",
+        "Avenida2",
+        "Imperial2"
+      ]
+    },
+    "global": {
+      "indices": [
+        4,
+        2,
+        13,
+        5,
+        9,
+        10,
+        7,
+        14,
+        3,
+        0,
+        11,
+        1,
+        8,
+        6,
+        12
+      ],
+      "names": [
+        "País",
+        "Año",
+        "Caldera2",
+        "Ciudad",
+        "González2",
+        "Avenida2",
+        "NumeroPiso",
+        "Copiapo2",
+        "Estación",
+        "Día",
+        "Imperial2",
+        "Mes",
+        "Miguel2",
+        "CalleLugar",
+        "A682"
+      ]
+    }
+  },
+  "parameters": {
+    "cnn_k3": 17219,
+    "cnn_k1": 16163,
+    "mlp_capacity": 17231
+  },
+  "planned_jobs": 405,
+  "smoke": false
+}

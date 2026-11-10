@@ -1,150 +1,104 @@
-# DL-2026-02-L02
+# Laboratorio 02: redes convolucionales 1D
 
-Avance del 04/11: corrida central completa y auditada (981 ajustes),
-[seis tablas comparativas](results/resumen/central/comparacion.md) y
-[borrador del informe](docs/informe.md). Las salidas por fila permanecen locales.
+**Deep Learning · Universidad Católica del Norte · 2026-02**
 
-El predictor por perfil incluye 6714 predicciones verificadas en los seis
-objetivos. [Resultados y reproducción](results/README.md#predictor-por-perfil).
-El [análisis de decisiones y perfiles](results/resumen/analisis/discusion.md)
-incluye comparaciones pareadas, recalls con soporte y dos figuras regenerables.
+**Equipo:** Gael Ortega y Johan Piñones.
 
-**Controles R2 históricos:** las cifras siguientes requieren revisión antes de
-integrarlas a la comparación final. El ejecutor actual usa un solo fold interno,
-omite el refit externo completo y entrena la MLP diez épocas; la llamada a las
-constantes también mezcla etiquetas originales con índices. Se conserva el
-trabajo de Johan; estos resultados deben revisarse antes de integrarlos al informe.
+Comparación de Conv1D + Softmax, Conv1D + CORAL y Conv1D + CORAL ponderada
+para predecir GDS y sus cinco recodificaciones a partir de 15 respuestas
+binarias. Los modelos comparten el tronco convolucional; cambian la cabeza
+y la pérdida de entrenamiento.
 
-## Tabla Consolidada: Rendimiento OOF promedio de Controles en $GDS\_R2$
-(resultados/controles/metricas_controles_GDS_R2.csv)
+## Resultados y alcance
 
-| Modelo de Control    | Estrategia / Configuración         | Accuracy (↑)  | Balanced Acc (↑) | MAE Ordinal (↓) | QWK (↑)       | Errores Graves (↓) |
-|----------------------|------------------------------------|---------------|------------------|-----------------|---------------|--------------------|
-| Constante (Moda)     | Moda global (Clase mayoritaria)    | 0.5800±0.0025 |         0.3333   | 0.5737±0.0044   |             0 | 0.1537±0.0023      |
-| Constante (Mediana)  | Mediana de la distribución         | 0.5800±0.0025 |         0.3333   | 0.5737±0.0044   |             0 | 0.1537±0.0023      |
-| Logística (Suma)     | Regresión Logística (Suma de bits) | 0.7363±0.0402 | 0.6486±0.0513    | 0.2816±0.0426   | 0.7023±0.0482 | 0.0179±0.0032      |
-| Logística (15 feats) | Regresión Logística (C por grid)   | 0.7256±0.0422 | 0.6425±0.0453    | 0.2914±0.0444   | 0.6908±0.0545 | 0.0170±0.0037      |
-| MLP Sencilla (Ref.)  | Red Neuronal Lab01 (15→H→K)        | 0.7238±0.0330 | 0.6203±0.0284    | 0.2985±0.0416   | 0.6633±0.0609 | 0.0224±0.0100      |
-| Hist. Grad. Boosting | Árboles con gradiente potenciado   | 0.7211±0.0405 | 0.6417±0.0424    | 0.2941±0.0442   | 0.6928±0.0547 | 0.0152±0.0040      |
+La comparación obligatoria está completa: tres variantes en seis objetivos,
+con 981 ajustes y las nueve métricas multiclase y ordinales solicitadas.
+Los estudios adicionales permiten analizar decisiones, perfiles de respuestas,
+controles sencillos, localidad y sensibilidad a la partición.
 
-## Análisis y Conclusiones del Comportamiento de los Controles
-**1. Establecimiento de la Cota Inferior (Predictores Constantes):**
-Los modelos basados en moda y mediana alcanzan una exactitud aproximada del $58\%$, pero con un QWK de $0.0$ y un MAE ordinal elevado ($\approx 0.57$), lo que evidencia que una estrategia ingenua es totalmente incapaz de capturar la estructura ordenada de las clases en $GDS\_R2$, incurriendo en tasas de errores graves cercanas al $15.3\%$. Esto confirma que cualquier arquitectura neuronal profunda posterior tiene una valla clara que superar obligatoriamente.
+| Estudio | Material disponible |
+|---|---|
+| Comparación obligatoria | [Seis tablas, confusiones OOF y selección del grid](results/resumen/central/comparacion.md) |
+| Controles en R2 | [Logísticas, MLP, boosting y constantes; 260 ajustes de selección/refit](results/resumen/controles/comparacion.md) |
+| Constantes en los seis objetivos | [Moda y mediana de entrenamiento externo](results/resumen/constantes/resumen_folds.csv) |
+| Decisiones y perfiles | [Comparaciones pareadas, soporte, recalls y figuras](results/resumen/analisis/discusion.md) |
+| Localidad y orden | [CNN-k3, CNN-k1 y MLP; 405 ajustes](results/resumen/localidad/completo/interpretacion.md) |
+| Robustez | [R1 y R2 con tres particiones; 780 ajustes adicionales](results/resumen/robustez/robustez.md) |
 
-<br>
+El [mapa de evidencia](docs/resultados.md) relaciona los requisitos y las siete
+preguntas del enunciado con su código, tablas y comprobaciones. Es la base
+para preparar después el informe con el formato docente. La redacción final,
+el PDF y el paquete de entrega quedan pendientes; el estado de las tareas y
+las fechas internas están en el [plan](PLAN_LABORATORIO.md).
 
-**2. Competitividad Sorprendente del Modelo Lineal Simple (logistica_suma):**
-Resulta sumamente notable que la Regresión Logística operando sobre la simple suma de bits de las entradas alcance el mejor desempeño general del bloque de control, con un QWK de $0.7023$ y un MAE de $0.2816$. Esto demuestra que la acumulación lineal de características cognitivas posee una correlación directa y muy fuerte con el objetivo $GDS\_R2$.
+Los resultados principales son **media ± desviación estándar de folds externos**
+(`ddof=0`); las métricas sobre todas las predicciones OOF se identifican aparte.
+GDS tiene solo dos casos de etapa 7: usa dos folds externos, configuración
+base y búsqueda interna omitida. Las cinco recodificaciones usan validación
+anidada 5×3 y cuatro candidatas seleccionadas por MAE, con desempate por QWK.
 
-<br>
+## Instalación y comprobación
 
-**3. Paridad entre Modelos Lineales, Neuronales y Tabulares:**
-La Regresión Logística sobre las 15 características completas, la MLP sencilla de referencia y el HistGradientBoosting se mueven en un rango de rendimiento muy cerrado (QWK entre $0.663$ y $0.693$). El HistGradientBoosting registra menos errores graves que la MLP (1.52\% frente a 2.24\%); los tres modelos mantienen resultados cercanos en el resto de las métricas.
-
-Proyecto base del **Laboratorio 02 de Deep Learning** (segundo semestre 2026):
-redes con una **capa convolucional 1D** para predecir la etapa de deterioro
-cognitivo (escala GDS) a partir de 15 respuestas binarias de un test de
-orientacion.
-
-Es la continuacion del Laboratorio 01: se mantiene el dataset, los seis
-experimentos (`GDS`, `GDS_R1` ... `GDS_R5`), la validacion cruzada anidada y
-las metricas multiclase y ordinales. El cambio principal es la arquitectura:
-cada fila de 15 atributos se trata como una secuencia de largo 15 y se procesa
-con `nn.Conv1d` antes del MLP.
-
-## Experimentos
-
-| Algoritmo | Arquitectura | Perdida | Prediccion | Estado |
-|---|---|---|---|---|
-| `conv1d_softmax` | Conv1D + MLP + `Linear(K)` | `CrossEntropyLoss` | `argmax` | Implementado |
-| `conv1d_coral` | Conv1D + MLP + `CoralLayer(K-1)` | BCE sobre umbrales | conteo de umbrales | Implementado y evaluado en seis objetivos |
-
-Ambos comparten el mismo tronco (`Conv1DBackbone`). Solo cambia la cabeza y la
-estrategia de entrenamiento (`ClassificationTask`).
-
-## Que esta implementado
-
-- Carga de datos `csv` / `sav` y recodificacion del objetivo a `0 .. K-1`.
-- `Dataset` que entrega cada fila como tensor `(1, 15)` para `nn.Conv1d`.
-- Bloques `Conv1DBlock` (Conv1d + BatchNorm1d + ReLU), extractor convolucional,
-  MLP y la red completa `Conv1DSoftmaxNet`.
-- Cabeza CORAL, red `Conv1DCoralNet`, pérdida ordinal y pesos por número efectivo.
-- Fabricas `ModelFactory` y `TaskFactory` para registrar algoritmos.
-- `Trainer` con Adam, `GridSearch` interna y `NestedCrossValidator` (5x3).
-- **Busqueda de hiperparametros en el loop interno**: recorre
-  `HYPERPARAMETER_GRID`, elige por menor MAE (empate: mayor QWK), reentrena en
-  todo el entrenamiento externo y evalua una sola vez en el test externo.
-- Metricas: accuracy, balanced accuracy, precision/recall/F1 macro, MAE, QWK,
-  accuracy ±1 y errores graves.
-- Reportes: CSV, Markdown, rankings, graficos de barras, matrices de confusion
-  y la configuracion elegida en cada fold (`seleccion_hp.csv`).
-
-## Próximos entregables
-
-- Integrar las extensiones de decisiones, perfiles y robustez con los controles
-  y el estudio de localidad; revisar conjuntamente el informe y producir el PDF.
-- La comparación obligatoria de tres variantes y seis objetivos ya está
-  disponible en `results/resumen/central/`.
-
-Detalle en [docs/04_extension_ordinal.md](docs/04_extension_ordinal.md).
-
-## Inicio rapido
+La suite conserva 14 comprobaciones esenciales de CORAL, particiones, selección
+con refit, métricas y cobertura OOF, con casos puntuales de perfiles, constantes
+y permutaciones. Usa datos sintéticos y no necesita el SAV ni corridas privadas.
 
 ```bash
+conda env create -f environment.yml
 conda activate lab_pytorch
-cp "/ruta/al/archivo/15 atributos R0-R5.sav" dataset/
+# Copiar el SAV docente a dataset/ antes de ejecutar experimentos.
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+python -m unittest discover -s tests -v
 
-# Un experimento rapido (sin grid) para verificar el entorno
-python main.py --data-path "dataset/15 atributos R0-R5.sav" --epochs 5 --no-grid
-
-# Experimento completo en GDS_R2 (grid interno + 5x3 folds)
-python main.py --data-path "dataset/15 atributos R0-R5.sav" --target-name GDS_R2
-
-# Los seis objetivos con tablas, rankings y graficos en results/
-python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets
+# Prueba corta de ambos algoritmos; no produce resultados finales.
+python main.py --data-path "dataset/15 atributos R0-R5.sav" --algorithm all --epochs 1 --no-grid --outer-folds 2 --inner-folds 2 --output-dir results/prueba_entorno
 ```
 
-Para revisar los datos y la arquitectura antes de entrenar, consulta
-[el problema](docs/01_problema.md) y [la arquitectura](docs/02_arquitectura.md).
-Las pruebas se ejecutan con `python -m unittest discover -s tests -v`.
+Cada configuración debe usar una carpeta de salida propia. El mismo comando
+puede recuperar folds completos si su manifiesto coincide. El SAV y las
+predicciones individuales se conservan localmente y no se incluyen en Git.
 
-## Estructura
+## Reproducir la comparación obligatoria
 
-```text
-DL-2026-02-L02/
-|-- main.py                  # CLI: arma ExperimentConfig y llama a ExperimentRunner
-|-- src/
-|   |-- config.py            # constantes, dataclasses de configuracion y HYPERPARAMETER_GRID
-|   |-- utils.py             # semillas y dispositivo
-|   |-- experiment.py        # ExperimentRunner: algoritmos x objetivos
-|   |-- data/                # DataFrameLoader, TargetEncoder, StratifiedSplitter, Dataset (1, 15)
-|   |-- models/              # Conv1DBlock, Conv1DBackbone, redes Softmax y CORAL, ModelFactory
-|   |-- tasks/               # ClassificationTask, SoftmaxTask, CoralTask, TaskFactory
-|   |-- training/            # Trainer, GridSearch, NestedCrossValidator
-|   |-- evaluation/          # MetricsCalculator
-|   `-- reporting/           # ReportWriter, rankings y graficos
-|-- docs/                    # documentacion por partes
-|-- dataset/                 # datos locales (no versionados)
-|-- results/                 # salidas de main.py (no versionadas)
-|-- environment.yml
-`-- README.md
+Desde la raíz, con `lab_pytorch` activo:
+
+```bash
+python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets --algorithm all --output-dir results/g4_2_central_unweighted
+python main.py --data-path "dataset/15 atributos R0-R5.sav" --all-targets --algorithm conv1d_coral --use-weights --output-dir results/g4_2_central_weighted
+
+# Verificar las corridas conservadas y regenerar agregados sin reentrenar.
+python -m experimentos.auditar_corrida results/g4_2_central_unweighted --eventos 654 --data-path "dataset/15 atributos R0-R5.sav"
+python -m experimentos.auditar_corrida results/g4_2_central_weighted --eventos 327 --data-path "dataset/15 atributos R0-R5.sav"
+python -m experimentos.comparacion results/g4_2_central_unweighted results/g4_2_central_weighted --output results/resumen/central
 ```
 
-## Documentacion
+Las redes usan Adam, 20 épocas, batch 32, tasa de aprendizaje 0.001 y
+weight decay 0.0001. CORAL ponderada utiliza beta 0.99 y conteos exclusivos
+del entrenamiento de cada ajuste. El test externo se evalúa después de la
+selección y el refit; no decide hiperparámetros, épocas ni semillas.
 
-1. [El problema](docs/01_problema.md): GDS, reagrupaciones, desbalance y por que
-   usar Conv1D sobre los 15 items.
-2. [Arquitectura](docs/02_arquitectura.md): convolucion 1D, trazado de formas,
-   clases y responsabilidades.
-3. [Uso](docs/03_uso.md): entorno, argumentos, ejemplos de comandos y salidas.
-4. [Extension ordinal](docs/04_extension_ordinal.md): CORAL, pesos por clase y
-   detalles de implementacion.
+Los pasos para reconstruir los demás estudios, trasladar datos y regenerar
+figuras están en [uso](docs/03_uso.md) y [resultados](results/README.md).
+Una copia de Git contiene código y agregados; las corridas individuales deben
+reconstruirse con el SAV o trasladarse de forma privada.
 
-## Plan sugerido para alumnos
+## Organización
 
-1. Leer [docs/01_problema.md](docs/01_problema.md) y revisar el dataset.
-2. Ejecutar `conv1d_softmax` en `GDS_R2` con `--no-grid` y luego con grid.
-3. Correr `--all-targets` y revisar `results/` (tablas, rankings, `seleccion_hp.csv`).
-4. Revisar la implementación CORAL (ver [docs/04_extension_ordinal.md](docs/04_extension_ordinal.md)).
-5. Ejecutar `--algorithm all` con y sin `--use-weights`.
-6. Completar el informe comparando Softmax y CORAL en los seis objetivos.
+| Ruta | Contenido |
+|---|---|
+| `main.py` | CLI y configuración de los experimentos centrales |
+| `src/` | Datos, modelos, tareas, entrenamiento, métricas y reportes |
+| `experimentos/` | Controles, estudios adicionales y auditorías |
+| `tests/` | Pruebas del contrato de datos, modelos y evaluación |
+| `results/resumen/` | Tablas, figuras y auditorías agregadas para consulta |
+| `docs/` | Explicaciones técnicas, reproducción y mapa de evidencia |
+| `dataset/` | SAV local, excluido de Git |
+
+## Documentación
+
+- [Problema, datos y recodificaciones](docs/01_problema.md).
+- [Convolución, formas y parámetros](docs/02_arquitectura.md).
+- [Entorno, comandos y reproducción](docs/03_uso.md).
+- [Implementación ordinal CORAL](docs/04_extension_ordinal.md).
+- [Requisitos y evidencia para el informe](docs/resultados.md).
+- [Plan y pendientes de entrega](PLAN_LABORATORIO.md).

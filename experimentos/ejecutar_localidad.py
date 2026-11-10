@@ -1,200 +1,176 @@
-"""
-Ejecución masiva del panel de localidad y orden de características (J4.1).
-Realiza los 405 ajustes especificados en el protocolo del Laboratorio 02,
-incorporando registro de logs y manejo robusto de errores.
-
-ejecutar:
-nohup python experimentos/ejecutar_localidad.py --data-path "dataset/15 atributos R0-R5.sav" --target-name GDS_R2 > results/localidad/console_output.log 2>&1 &
-
-logs con errores:
-cat results/localidad/console_output.log
-
-ver logs de progreso en tiempo real:
-tail -f results/localidad/resultados_localidad.log
-
-verificar que se está ejecutando (sin contar el pid de grep):
-ps aux | grep ejecutar_localidad.py
-"""
-
+"""Panel fijo de localidad; salidas individuales solo en results/localidad."""
 from __future__ import annotations
 
 import argparse
+import hashlib
+import itertools
+import json
+import os
 from pathlib import Path
-import logging
 import sys
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import numpy as np
+import pandas as pd
+import torch
+
+from experimentos.localidad import apply_order_to_features, build_locality_model, get_feature_permutation
+from src.config import FEATURE_COLUMNS, TrainingConfig
 from src.data.loader import DataFrameLoader
 from src.data.preprocessing import prepare_experiment_data, StratifiedSplitter
-from src.data.dataset import CognitiveSequenceDataset
-from src.evaluation.metrics import MetricsCalculator
-from experimentos.localidad import build_locality_model, apply_order_to_features
-from src.utils import resolve_device
+from src.evaluation.metrics import METRIC_KEYS, MetricsCalculator
+from src.tasks.softmax_task import SoftmaxTask
+from src.training.trainer import Trainer
+from src.utils import set_seed
+
+ROOT = Path(__file__).resolve().parents[1]
+MODELS = ('cnn_k3', 'cnn_k1', 'mlp_capacity')
+ORDERS = ('original', 'blocks', 'global')
+SPLIT_SEEDS = (42, 314, 2718)
+INIT_SEEDS = (7, 17, 29)
+METRICS = METRIC_KEYS + ['nll', 'rps']
+CODE_FILES = ('experimentos/ejecutar_localidad.py', 'experimentos/localidad.py',
+              'src/models/conv_softmax.py', 'src/models/blocks.py', 'src/config.py',
+              'src/training/trainer.py', 'src/tasks/softmax_task.py', 'src/tasks/base.py',
+              'src/data/loader.py', 'src/data/preprocessing.py', 'src/data/dataset.py',
+              'src/evaluation/metrics.py', 'src/utils.py')
 
 
-def configurar_logger(output_dir: Path) -> logging.Logger:
-    """Configura el logger para escribir simultáneamente en consola y archivo."""
-    logger = logging.getLogger("LocalidadRunner")
-    logger.setLevel(logging.INFO)
-    logger.handlers.clear()
-
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-
-    # Handler para consola
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
-    # Handler para archivo de log
-    log_path = output_dir / "resultados_localidad.log"
-    fh = logging.FileHandler(log_path, encoding="utf-8")
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-
-    return logger
+def jobs():
+    return [dict(model=m, order=o, split_seed=s, init_seed=i, fold=f)
+            for m, o, s, i, f in itertools.product(MODELS, ORDERS, SPLIT_SEEDS, INIT_SEEDS, range(1, 6))]
 
 
-def ejecutar_panel_localidad(
-    sav_path: Path,
-    target_name: str = "GDS_R2",
-    output_dir: Path = Path("results/localidad")
-):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    logger = configurar_logger(output_dir)
-    
-    logger.info(f"Iniciando carga de datos desde: {sav_path} para objetivo: {target_name}")
-    
-    # 1. Cargar datos con el loader oficial
-    loader = DataFrameLoader()
-    df = loader.load(sav_path)
-    preparado = prepare_experiment_data(df, target_name, loader)
-    X_base, y, classes = preparado.X, preparado.y, preparado.classes
-    num_classes = len(classes)
-    
-    logger.info(f"Datos cargados con éxito. Muestras: {len(X_base)} | Clases: {num_classes}")
+def job_name(job):
+    return '{model}_{order}_s{split_seed}_i{init_seed}_f{fold}'.format(**job)
 
-    # Parámetros del panel según protocolo (Sección 3.4)
-    modelos_nombres = ["cnn_k3", "cnn_k1", "mlp_capacity"]
-    ordenes = ["original", "blocks", "global"]
-    particion_seeds = [42, 314, 2718]
-    init_seeds = [7, 17, 29]
-    n_splits = 5
-    epochs = 20
-    batch_size = 32
-    lr = 1e-3
-    weight_decay = 1e-4
 
-    device = resolve_device("auto")
-    logger.info(f"Dispositivo seleccionado para ejecución: {device}")
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
-    resultados_totales = []
-    total_ajustes = len(modelos_nombres) * len(ordenes) * len(particion_seeds) * len(init_seeds) * n_splits
-    contador = 0
-    errores_contador = 0
 
-    # 2. Iteración completa sobre las dimensiones del panel
-    for p_seed in particion_seeds:
-        splitter = StratifiedSplitter(n_splits=n_splits, random_state=p_seed)
-        
-        for order_type in ordenes:
-            X_ord = apply_order_to_features(X_base, order_type)
-            
-            for outer_fold, (train_idx, test_idx) in enumerate(splitter.split(y), start=1):
-                X_tr, y_tr = X_ord[train_idx], y[train_idx]
-                X_te, y_te = X_ord[test_idx], y[test_idx]
-                
-                for init_seed in init_seeds:
-                    for mod_name in modelos_nombres:
-                        contador += 1
-                        msg_base = f"[{contador}/{total_ajustes}] Split: {p_seed} | Orden: {order_type} | Fold: {outer_fold} | Init: {init_seed} | Modelo: {mod_name}"
-                        
-                        try:
-                            # Fijar semillas
-                            torch.manual_seed(init_seed)
-                            np.random.seed(init_seed)
-                            
-                            # Construir modelo
-                            model = build_locality_model(mod_name, num_features=15, num_classes=num_classes).to(device)
-                            
-                            # Preparar dataloaders
-                            train_dataset = CognitiveSequenceDataset(X_tr, y_tr.astype(np.int64))
-                            train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-                            
-                            test_dataset = CognitiveSequenceDataset(X_te, np.zeros(len(X_te), dtype=np.int64))
-                            test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-                            
-                            # Entrenamiento
-                            criterion = nn.CrossEntropyLoss()
-                            optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-                            
-                            model.train()
-                            for _ in range(epochs):
-                                for inputs, targets in train_loader:
-                                    inputs = inputs.to(device)
-                                    targets = targets.to(device).long()
-                                    
-                                    optimizer.zero_grad()
-                                    logits = model(inputs)
-                                    if logits.ndim > 2:
-                                        logits = logits.squeeze(1)
-                                    loss = criterion(logits, targets)
-                                    loss.backward()
-                                    optimizer.step()
-                            
-                            # Evaluación OOF
-                            model.eval()
-                            preds_list = []
-                            with torch.no_grad():
-                                for inputs, _ in test_loader:
-                                    logits = model(inputs.to(device))
-                                    if logits.ndim > 2:
-                                        logits = logits.squeeze(1)
-                                    preds = torch.argmax(logits, dim=1).cpu().numpy()
-                                    preds_list.append(preds)
-                            y_pred = np.concatenate(preds_list)
-                            
-                            metricas = MetricsCalculator.compute(y_te, y_pred)
-                            
-                            registro = {
-                                "objetivo": target_name,
-                                "split_seed": p_seed,
-                                "orden": order_type,
-                                "fold": outer_fold,
-                                "init_seed": init_seed,
-                                "modelo": mod_name,
-                                **metricas
-                            }
-                            resultados_totales.append(registro)
-                            logger.info(f"{msg_base} -> OK | Acc: {metricas['accuracy']:.4f} | MAE: {metricas['mae_ordinal']:.4f}")
+def metricas(y, probabilities):
+    pred = probabilities.argmax(axis=1)
+    return {**MetricsCalculator.compute(y, pred, probabilities.shape[1]),
+            'nll': MetricsCalculator.nll(y, probabilities), 'rps': MetricsCalculator.rps(y, probabilities)}
 
-                        except Exception as e:
-                            errores_contador += 1
-                            logger.error(f"{msg_base} -> ERROR: {str(e)}", exc_info=True)
 
-    # Guardar resultados consolidados en CSV
-    df_resultados = pd.DataFrame(resultados_totales)
-    csv_path = output_dir / f"metricas_localidad_{target_name}.csv"
-    df_resultados.to_csv(csv_path, index=False, encoding="utf-8")
-    
-    logger.info(f"Ejecución finalizada. Ajustes exitosos: {len(resultados_totales)}/{total_ajustes}. Errores: {errores_contador}")
-    logger.info(f"Resultados guardados en: {csv_path}")
+def atomic_json(path, value):
+    tmp = path.with_suffix(path.suffix + '.tmp')
+    tmp.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
+    os.replace(tmp, path)
+
+
+def run(data_path, output, summary, smoke=False, report_only=False):
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
+    output.mkdir(parents=True, exist_ok=True)
+    summary.mkdir(parents=True, exist_ok=True)
+    folds_dir = output / 'folds'
+    folds_dir.mkdir(exist_ok=True)
+    data = prepare_experiment_data(DataFrameLoader().load(data_path), 'GDS_R2')
+    X, y = data.X, data.y
+    assert X.shape == (1119, 15) and len(data.classes) == 3
+    splits = {s: StratifiedSplitter(5, s).split(y) for s in SPLIT_SEEDS}
+    selected = [j for j in jobs() if not smoke or (j['split_seed'] == 42 and j['init_seed'] == 7 and j['fold'] == 1)]
+    manifest = {'data_sha256': digest(data_path), 'code_sha256': {p: digest(ROOT / p) for p in CODE_FILES},
+                'epochs': 1 if smoke else 20, 'target': 'GDS_R2', 'classes': data.classes,
+                'optimizer': 'Adam', 'learning_rate': .001, 'weight_decay': .0001, 'batch_size': 32,
+                'device': 'cpu', 'threads': 1, 'inner_folds': 0, 'grid': False,
+                'seed_rule': 'init_seed + 1000 * fold (one-based); same for all models and orders',
+                'orders': {o: {'indices': get_feature_permutation(o), 'names': [FEATURE_COLUMNS[i] for i in get_feature_permutation(o)]} for o in ORDERS},
+                'parameters': {m: sum(p.numel() for p in build_locality_model(m).parameters()) for m in MODELS},
+                'planned_jobs': len(selected), 'smoke': smoke}
+    manifest_path = output / 'manifest.json'
+    if manifest_path.exists():
+        if json.loads(manifest_path.read_text()) != manifest:
+            raise ValueError('Identidad distinta: use otro directorio; no se mezclan corridas.')
+    else:
+        atomic_json(manifest_path, manifest)
+    atomic_json(output / 'planned_jobs.json', selected)
+    atomic_json(output / 'splits.json', {str(s): [{'fold': f, 'train': tr.tolist(), 'test': te.tolist()} for f, (tr, te) in enumerate(parts, 1)] for s, parts in splits.items()})
+    for n, job in enumerate(selected, 1):
+        path = folds_dir / (job_name(job) + '.npz')
+        train_idx, test_idx = splits[job['split_seed']][job['fold'] - 1]
+        if path.exists():
+            with np.load(path, allow_pickle=False) as saved:
+                if (not np.array_equal(saved['index'], test_idx) or not np.array_equal(saved['y'], y[test_idx])
+                        or saved['probabilities'].shape != (len(test_idx), len(data.classes))
+                        or int(saved['epochs']) != manifest['epochs']):
+                    raise ValueError(f'Fold inconsistente: {path}')
+                metricas(saved['y'], saved['probabilities'])
+            continue
+        if report_only:
+            raise ValueError(f'Falta fold: {path}')
+        seed = job['init_seed'] + 1000 * job['fold']
+        set_seed(seed)
+        model = build_locality_model(job['model'])
+        trainer = Trainer(model, SoftmaxTask(len(data.classes)), TrainingConfig(epochs=manifest['epochs']), torch.device('cpu'))
+        ordered = apply_order_to_features(X, job['order'])
+        losses = trainer.fit(ordered[train_idx], y[train_idx], seed)
+        probabilities = trainer.predict_proba(ordered[test_idx])
+        metricas(y[test_idx], probabilities)
+        tmp = path.with_suffix('.tmp')
+        with tmp.open('wb') as file:
+            np.savez_compressed(file, index=test_idx, y=y[test_idx], probabilities=probabilities, losses=losses, epochs=manifest['epochs'])
+        os.replace(tmp, path)
+        print(f'{n}/{len(selected)} {job_name(job)}', flush=True)
+    if smoke:
+        print('Preflight: nueve ajustes de una época completos.', flush=True)
+        return
+    records, oof_records = [], []
+    for model, order, split_seed, init_seed in itertools.product(MODELS, ORDERS, SPLIT_SEEDS, INIT_SEEDS):
+        condition = dict(model=model, order=order, split_seed=split_seed, init_seed=init_seed)
+        all_index, all_y, all_p = [], [], []
+        for fold in range(1, 6):
+            job = {**condition, 'fold': fold}
+            with np.load(folds_dir / (job_name(job) + '.npz'), allow_pickle=False) as saved:
+                idx, truth, probs = saved['index'], saved['y'], saved['probabilities']
+                all_index.append(idx); all_y.append(truth); all_p.append(probs)
+                records.append({**job, 'n': len(idx), **metricas(truth, probs)})
+        index, truth, probs = map(np.concatenate, (all_index, all_y, all_p))
+        if not np.array_equal(np.sort(index), np.arange(len(y))) or not np.array_equal(truth, y[index]):
+            raise ValueError(f'Cobertura OOF incorrecta: {condition}')
+        oof_records.append({**condition, 'n': len(index), **metricas(truth, probs)})
+    frame = pd.DataFrame(records)
+    oof = pd.DataFrame(oof_records)
+    if len(frame) != 405 or len(oof) != 81:
+        raise ValueError('Cobertura incompleta')
+    frame.to_csv(summary / 'folds.csv', index=False)
+    oof.to_csv(summary / 'oof_condiciones.csv', index=False)
+    groups = frame.groupby(['model', 'order', 'split_seed', 'init_seed'])[METRICS]
+    agg = groups.agg(['mean', lambda x: x.std(ddof=0)])
+    agg.columns = [f'{a}_{"std0" if b == "<lambda_0>" else b}' for a, b in agg.columns]
+    agg.reset_index().to_csv(summary / 'resumen_folds.csv', index=False)
+    paired = oof.merge(oof[oof.model == 'cnn_k3'][['order', 'split_seed', 'init_seed', 'mae_ordinal']], on=['order', 'split_seed', 'init_seed'], suffixes=('', '_k3'))
+    paired['delta_mae_vs_k3'] = paired.mae_ordinal - paired.mae_ordinal_k3
+    paired[['model', 'order', 'split_seed', 'init_seed', 'delta_mae_vs_k3']].to_csv(summary / 'comparacion_pareada.csv', index=False)
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4), sharey=True)
+    for ax, model in zip(axes, MODELS):
+        for k, split in enumerate(SPLIT_SEEDS):
+            for j, init in enumerate(INIT_SEEDS):
+                rows = oof[(oof.model == model) & (oof.split_seed == split) & (oof.init_seed == init)].set_index('order').loc[list(ORDERS)]
+                ax.plot(np.arange(3), rows.mae_ordinal, marker=('o', 's', '^')[j], color=('tab:blue', 'tab:orange', 'tab:green')[k], alpha=.75, label=f'partición {split}, init {init}')
+        ax.set_xticks(range(3), ORDERS); ax.set_title(model); ax.grid(alpha=.2)
+    axes[0].set_ylabel('MAE ordinal OOF'); axes[-1].legend(fontsize=7, bbox_to_anchor=(1.02, 1), loc='upper left')
+    fig.tight_layout(); fig.savefig(summary / 'mae_localidad.png', dpi=160); plt.close(fig)
+    atomic_json(summary / 'metadatos.json', manifest)
+    print('Validado: 405 folds, 81 condiciones y 1119 filas OOF por condición.', flush=True)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Ejecutar panel de localidad J4.1 con logs")
-    parser.add_argument("--data-path", type=Path, required=True, help="Ruta al archivo SAV")
-    parser.add_argument("--target-name", type=str, default="GDS_R2", help="Objetivo a evaluar")
-    parser.add_argument("--output-dir", type=Path, default=Path("results/localidad"), help="Directorio de salida")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data-path', type=Path, default=ROOT / 'dataset/15 atributos R0-R5.sav')
+    parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--report-only', action='store_true')
     args = parser.parse_args()
-    
-    ejecutar_panel_localidad(args.data_path, args.target_name, args.output_dir)
+    suffix = 'preflight' if args.smoke else 'completo'
+    run(args.data_path, ROOT / 'results/localidad' / suffix, ROOT / 'results/resumen/localidad' / suffix, args.smoke, args.report_only)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

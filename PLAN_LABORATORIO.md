@@ -2,11 +2,14 @@
 
 **Equipo:** Gael y Johan.
 
-**Entrega final:** 12 de noviembre de 2026, a las **23:59**, zona horaria
-**America/Santiago**.
+**Fecha oficial:** el profesor anunció una prórroga; falta confirmar la nueva
+fecha. El 12 de noviembre de 2026 a las 23:59 (America/Santiago), fecha original,
+se conserva como meta interna para no postergar el cierre.
 
-**Objetivo interno:** PDF y código revisados el 10 de noviembre; revisión final
-el día 11. Todas las fechas de este documento corresponden a 2026.
+**Prioridad inmediata:** consolidar código y evidencia reproducible en `main`,
+revisarlos entre ambos y preparar después el informe con el formato específico
+del profesor. La prórroga no abre nuevos experimentos ni cambia el protocolo.
+Todas las fechas del tablero son metas internas de 2026.
 
 ## 1. Cómo usar este documento
 
@@ -32,12 +35,16 @@ Estados permitidos: **pendiente, en curso, bloqueada, en revisión, terminada**.
 Cambiar responsables o fechas mediante un acuerdo registrado. El informe se
 redacta entre ambos, con partes repartidas y revisión final conjunta.
 
-**Estado al 08/11/2026:** la comparación central, los análisis de decisiones,
-perfiles y robustez, y el estudio de localidad están terminados.
-Las tareas posteriores, incluida la integración conjunta,
-conservan su estado del tablero. Se conserva el avance de Johan ya compartido.
-Por decisión de Gael, el cómputo y los artefactos restantes se mantendrán en
-local. G4.4 conserva el bloqueo histórico; no se reintentará el acceso al servidor.
+**Estado técnico:** comparación obligatoria, controles corregidos, constantes,
+decisiones, perfiles, robustez y localidad reunidos en `main`. Los agregados
+están en `results/resumen/` y el mapa de requisitos en `docs/resultados.md`.
+El informe final no se incorpora en esta integración: H6.1 sigue pendiente
+hasta trabajar sobre el formato docente. Reproducción de código y cierre del
+paquete se distinguen de la preparación del PDF.
+
+El cómputo y los artefactos individuales permanecen en local. G4.4 conserva
+el bloqueo histórico de SSH; no bloquea la entrega, porque los estudios se
+completaron en CPU. No se reintentará el servidor como parte del cierre.
 
 ### Tablero de tareas
 
@@ -60,7 +67,7 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G2.5 Integración CORAL | Gael | 29/10 | G2.4 | terminada | Corridas cortas con y sin pesos y prueba de integración aprobadas el 28/10 |
 | [x] | J2.1 MLP de referencia | Johan | 31/10 | J1.2 | terminada | Implementación de la red poco profunda de referencia ($15 \to H \to K$) con ReLU y dropout, integrando el grid interno sobre las 4 candidatas de hiperparámetros y validación aprobada en la suite de pruebas.    |
 | [x] | J2.2 Boosting | Johan | 31/10 | J1.2 | terminada | Implementación y validación del control basado en HistGradientBoosting barriendo los candidatos de *max_leaf_nodes* $\in \{3, 7, 15, 31\}$ guiado por MAE y QWK. |
-| [x] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | terminada | Ejecución del barrido OOF de todos los modelos de control sobre el objetivo GDS_R2 con partición externa de 5 folds, consolidación de la tabla de métricas y análisis comparativo. |
+| [x] | J2.3 Comparación de controles | Johan | 31/10 | J2.1, J2.2 | terminada | 260 ajustes corregidos: tres internos y refit externo, MLP 20 épocas; constantes en seis objetivos; agregados en `results/resumen/controles/` y `constantes/` |
 | [x] | G3.1 Métricas y alfabeto | Gael | 31/10 | G1.1 | terminada | Alfabeto completo, QWK no estimable, NLL/RPS y pruebas; corrida corta Softmax/R2 verificada |
 | [x] | G3.2 Particiones y semillas | Gael | 31/10 | G1.1, H0.3 | terminada | Índices globales persistidos, semillas separadas, GDS sin búsqueda interna y pruebas aprobadas |
 | [x] | G3.3 Probabilidades | Gael | 31/10 | G2.5 | terminada | Softmax y CORAL exponen logits, probabilidades y decisión original; pruebas aprobadas |
@@ -68,22 +75,22 @@ actualizan aquí; no es necesario repetirlos en cada ficha.
 | [x] | G3.5 Predicciones y reportes | Gael | 31/10 | G3.1, G3.3, G3.4 | terminada | Predicciones por fila y variante, confusión agregada y reportes regenerables comprobados |
 | [x] | G4.1 Piloto de cómputo | Gael | 01/11 | G3.5 | terminada | Revisión 04/11: 18 ajustes válidos; CPU local, un hilo y hasta dos procesos |
 | [x] | G4.2 Corrida obligatoria | Gael | 02/11 | G4.1 | terminada | 04/11: auditoría reproducible aprobada, 981 ajustes y 81 folds; results/resumen/central/auditoria.json |
-| [x] | G4.3 Tablas y borrador | Gael | 02/11 | G4.2 | terminada | 04/11: seis tablas de tres variantes, NLL/RPS y confusiones OOF; docs/informe.md |
+| [x] | G4.3 Tablas y material técnico | Gael | 02/11 | G4.2 | terminada | 04/11: seis tablas de tres variantes, NLL/RPS y confusiones OOF; docs/resultados.md |
 | [ ] | G4.4 Revisar servidor y GPU | Gael | 04/11 | — | bloqueada | 04/11: timeout y autenticación rechazada en puente SSH; GPU actual sin comprobar |
 | [x] | J3.1 Modelos de localidad | Johan | 03/11 | J2.1 | terminada | Implementación de CNN-k3, CNN-k1 y MLP de capacidad próxima en el módulo de localidad, con pruebas unitarias aprobadas. |
 | [x] | J3.2 Órdenes y prueba corta | Johan | 03/11 | J3.1, G3.2 | terminada | Implementación de los tres esquemas de permutación de características (original, bloques, global) y validación de consistencia con los índices globales de partición. |
 | [x] | G5.1 Moda y mediana | Gael | 05/11 | G4.2 | terminada | 04/11: reglas sobre probabilidades OOF, comparación por fold y equivalencia binaria comprobadas |
 | [x] | G5.2 Predictor por perfil | Gael | 05/11 | G3.2, G3.3 | terminada | 06/11: 6714 predicciones, 27 folds, coincidencia exacta con referencia; siete pruebas nuevas y suite de 53 aprobadas |
 | [x] | G5.3 Análisis de decisiones y perfiles | Gael | 05/11 | G5.1, G5.2 | terminada | 06/11: 26856 predicciones alineadas, dos figuras y discusión regenerables; suite de 57 pruebas aprobada |
-| [x] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | terminada | 07/11: ejecución masiva de los 405 ajustes en los modelos CNN-k3, CNN-k1 y MLP de capacidad próxima |
-| [x] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | terminada | 07/11: Graficación y análisis por arquitectura (modelo) y orden de características |
+| [x] | J4.1 Ejecución de localidad | Johan | 06/11 | J3.2, G4.1 | terminada | 405 ajustes verificados, 81 condiciones OOF y 1119 filas por condición; ejecutor reproducible integrado |
+| [x] | J4.2 Análisis de localidad | Johan | 06/11 | J4.1 | terminada | Figura y deltas por orden, partición e inicialización; agregados e interpretación en `results/resumen/localidad/completo/` |
 | [x] | H5.1 Robustez | Gael | 08/11 | G4.3 | terminada | 08/11: 780 ajustes existentes auditados; comparación de tres particiones y selección en `results/resumen/robustez/` |
-| [ ] | H5.2 Integración de resultados | Gael y Johan | 08/11 | J2.3, G5.3, J4.2, H5.1 | pendiente | — |
-| [ ] | H6.1 Informe completo | Gael y Johan | 10/11 | H5.2 | pendiente | — |
-| [ ] | H6.2 Reproducción | Gael y Johan | 10/11 | H6.1 | pendiente | — |
-| [ ] | H6.3 Archivos de entrega | Gael y Johan | 10/11 | H6.2 | pendiente | — |
-| [ ] | F1 Revisión final | Gael y Johan | 11/11 | H6.3 | pendiente | — |
-| [ ] | F2 Entrega | Gael y Johan | 12/11, 23:59 | F1 | pendiente | — |
+| [x] | H5.2 Integración de resultados | Gael y Johan | 10/11 | J2.3, G5.3, J4.2, H5.1 | terminada | Código y agregados recuperados selectivamente; se conservan análisis recientes de `main`; mapa de evidencia y README preparados |
+| [ ] | H6.1 Informe completo | Gael y Johan | Antes de la meta interna | H5.2 | pendiente | Preparar después con el formato específico del profesor; sin PDF ni fuente IEEE incorporados |
+| [ ] | H6.2 Reproducción | Gael y Johan | 10/11 | H5.2 | pendiente | Registrar y revisar la reproducción final en la siguiente etapa; cotejar después con el informe |
+| [ ] | H6.3 Archivos de entrega | Gael y Johan | 12/11, meta interna | H6.1, H6.2 | pendiente | Generar el paquete cuando estén revisados código e informe |
+| [ ] | F1 Revisión final | Gael y Johan | Tras H6.3, antes del 12/11 | H6.3 | pendiente | Revisión del material el 11/11; revisión final cuando estén PDF y ZIP |
+| [ ] | F2 Entrega | Gael y Johan | Nueva fecha oficial por confirmar | F1 | pendiente | Meta interna: 12/11, 23:59; comprobar recepción por el mecanismo del curso |
 
 ## 2. Qué se busca demostrar
 
@@ -108,16 +115,16 @@ general, causalidad ni utilidad clínica a partir de este estudio.
 
 ### Referencias iniciales sobre datos y código
 
-Estos valores se verificaron en la revisión inicial y serán reproducidos en G1:
+La revisión inicial, reproducida en G1, estableció:
 
 - 1119 registros; ID, 15 entradas binarias y seis objetivos.
 - Sin faltantes observados; ID únicos y cinco recodificaciones consistentes.
 - 321 perfiles de entrada; 97 con etiquetas GDS diferentes, que abarcan 851 filas.
 - GDS contiene dos registros de etapa 7. El ID no entra como predictor.
-- La plantilla incluye Softmax, grid, entrenamiento y validación. Faltan CORAL
-  y las funciones ordinales señaladas como TODO.
-- Los reportes iniciales muestran la confusión del último fold. Será necesario
-  exportar probabilidades y agregar todos los folds externos.
+- La plantilla aportó Softmax, grid y validación; CORAL y las funciones ordinales
+  están implementadas y probadas.
+- Los reportes actuales incluyen probabilidades y confusiones OOF agregadas.
+  Las imágenes históricas del último fold no representan toda la evaluación.
 
 Un ID único no demuestra que cada fila sea una persona distinta. Tampoco se
 eliminarán filas por compartir respuestas: un mismo perfil puede corresponder
@@ -277,47 +284,46 @@ en la sección 7.
 
 ### Próximos pasos
 
-- **Gael, 26/10:** revisar los datos y comprobar cómo funciona la red entregada
-  en la plantilla (G1.1 y G1.2).
-- **Johan, 27/10:** preparar los primeros modelos de comparación: uno que siempre
-  responde lo mismo y otros que usan regresión logística (J1.1 y J1.2).
-- **Gael, 31/10:** dejar listas las funciones y archivos comunes para evaluar
-  los modelos y juntar sus resultados (G3). Hasta entonces usamos las funciones
-  que ya tiene la plantilla.
+1. Revisar juntos el código y los agregados consolidados; comprobar las siete
+   preguntas con el mapa de evidencia (H6.2).
+2. Preparar el informe usando el formato específico del profesor (H6.1).
+3. Cotejar cada tabla y figura del informe con sus agregados, generar el ZIP y
+   comprobar acceso al repositorio (H6.3 y F1).
+4. Confirmar la fecha oficial prorrogada y verificar la recepción (F2),
+   manteniendo el 12/11 como meta interna de cierre.
 
-H0.3 cerrada el 25/10 tras la confirmación de Johan al reparto general y al
-trabajo conjunto en el informe. Las tareas y fechas del tablero se mantienen;
-cualquier ajuste posterior se anota en el registro de avances.
+El reparto general está acordado. Esta consolidación no cambia el protocolo
+ni añade experimentos exploratorios a partir del test externo.
 
 ### Archivos de cada integrante
 
 Gael mantiene `main.py`, `src/`, validación y reportes comunes. Johan desarrolla
 sus controles y localidad en `experimentos/controles.py` y
 `experimentos/localidad.py`; sus pruebas se llaman `test_controles.py` y
-`test_localidad.py`. Estos archivos son entregables futuros, no implementaciones
-ya disponibles. Acordar cualquier cambio de los módulos compartidos.
+`test_localidad.py`. Los ejecutores corregidos y sus pruebas están integrados.
+Acordar cualquier cambio posterior de los módulos compartidos.
 
 ### Datos, particiones e interfaces
 
 - Entrada: X `(N,15)` float32, en el orden docente; y `(N,)` int64 en `0..K−1`.
 - `row_id`: posición original de fila, base cero, ligada al hash del SAV. El ID
   original nunca entra en X. Conservar el mapa de clases originales e índices.
-- Para avanzar antes de G3, reutilizar `prepare_experiment_data`, que devuelve
+- Reutilizar `prepare_experiment_data`, que devuelve
   `ExperimentData` con `X`, `y` y `classes`, y `StratifiedSplitter` de la plantilla.
   No crear otra recodificación ni otro protocolo de partición.
 - En los controles de R2, conservar los cinco folds externos con semilla 42.
   Los tres internos usan `42 + 100 * outer_fold`, numerando externos desde 1,
   como en la plantilla. Sus índices son locales al entrenamiento externo:
   convertirlos a filas globales mediante `train_idx[inner_idx]`.
-- G3 exportará índices en la numeración global de filas. Cada inner fold estará
-  contenido en el entrenamiento externo. Los controles consumirán esas mismas
-  particiones y verificarán que coincidan con las que usaron al comenzar.
+- Los índices guardados están en la numeración global de filas. Cada inner fold
+  está contenido en el entrenamiento externo. Los controles consumen esas mismas
+  particiones y verifican su identidad.
 - Separar `split_seed` e `init_seed`, manteniendo `--seed` como referencia de
   compatibilidad cuando no se especifiquen por separado.
 - Fijar el mismo conjunto de semillas de entrenamiento por fold y candidata;
   no usar `candidate_index` para cambiar inicializaciones. Igual semilla no
   equivale a igual inicialización entre arquitecturas diferentes.
-- Ampliar las tareas con `probabilities(logits)` → `(B,K)` y el Trainer con
+- Las tareas exponen `probabilities(logits)` → `(B,K)` y el Trainer
   `predict_proba(X)` → `(N,K)`, preservando `predict(X)` → `(N,)`.
 - Los controles clásicos usan `fit` y `predict_proba`; alinear sus columnas con
   el alfabeto completo. Exponer un fallo de ajuste, no rellenarlo con una métrica.
@@ -342,8 +348,8 @@ Guardar cada fold completado y retomar solo si coincide el manifiesto. Conservar
 errores como ejecuciones fallidas; no transformar ausencias en resultados cero.
 No convertir que falte CORAL en una corrida completa con salida exitosa.
 
-Las tablas y figuras agregadas elegidas se copiarán a `docs/resultados/` para
-versionarlas. Registrar su corrida de origen. Las confusiones principales suman
+Las tablas y figuras agregadas se versionan en `results/resumen/`, con sus
+corridas de origen. El mapa de lectura está en `docs/resultados.md`. Las confusiones principales suman
 todos los folds, con etiquetas originales y soporte por clase.
 
 Para métricas macro y QWK usar el alfabeto completo. Balanced accuracy promedia
@@ -355,6 +361,12 @@ mostrar cuántos folds tienen una métrica válida, sin omitirlos silenciosament
 
 Los nombres de módulos, pruebas y scripts que aún no existen son entregables
 de su ficha. Sus comandos de comprobación estarán disponibles al cerrarla.
+
+**Pruebas actuales:** la suite se redujo a 14 comprobaciones esenciales. Las
+fichas cerradas conservan nombres y conteos históricos de pruebas, algunas
+retiradas. Para comprobar el estado actual usar
+`python -m unittest discover -s tests -v`; no es necesario repetir corridas
+completas por cambios de documentación.
 Ejecutar los comandos desde la raíz, con el entorno del laboratorio activo.
 
 ### H0.1 — Organización documental
@@ -564,7 +576,8 @@ y análisis, más cómputo. **Insumos:** J2.1, J2.2 y logística.
 2. Evaluar constantes en los seis objetivos con los folds externos previstos.
 3. Escribir tabla, soporte por clase y una interpretación breve de capacidad e información.
 
-**Entregable:** resultados en `results/controles/` y borrador de su sección.
+**Entregable:** agregados corregidos en `results/resumen/controles/` y
+`results/resumen/constantes/`; artefactos individuales solo en local.
 **Comprobación:** pruebas de controles, integridad OOF y regeneración de la tabla.
 **Aceptación:** 260 ajustes de selección/refit R2, sin contar constantes;
 candidatas, probabilidades y métricas trazables. La comparación final con CNN
@@ -713,24 +726,21 @@ Las particiones coinciden entre carpetas. Comandos y evidencia agregada en
 corrida obligatoria y documentación docente.
 
 1. Preparar seis tablas de tres variantes, con todas las métricas y notas GDS.
-2. Redactar datos, convolución, CORAL, metodología y respuestas mínimas provisionales.
+2. Organizar evidencia de datos, convolución, CORAL y respuestas mínimas.
 
-**Entregable:** tablas agregadas y borrador del informe.
+**Entregable:** tablas agregadas y material técnico para redactar después.
 **Comprobación:** regeneración de tablas y lista de requisitos de la sección 7.
 **Aceptación:** comparación obligatoria completa y explicable, sin depender de
 que estén terminadas las extensiones.
 
-**Cierre 04/11:** seis tablas con nueve métricas (media ± std, ddof=0),
-complemento NLL/RPS, confusiones agregadas y frecuencias del grid regenerables
-sin entrenar. Borrador único en `docs/informe.md`, organizado según plantilla;
-incluye respuestas provisionales a las siete preguntas y límites de la
-comparación. El PDF conjunto y la validación de páginas siguen en H6.
+**Material disponible:** seis tablas con nueve métricas (media ± std,
+ddof=0), NLL/RPS, confusiones agregadas y frecuencias del grid regenerables.
+`docs/resultados.md` organiza las evidencias y las siete preguntas. El borrador
+anterior se sustituyó por este mapa; la redacción final y su formato siguen en H6.
 
-**Dependencia de integración:** antes de H5.2, revisar con Johan el ejecutor
-de controles: usa solo un fold interno, no realiza refit externo completo,
-fija diez épocas para la MLP y mezcla índices con clases originales al llamar
-las constantes. No se modificaron sus módulos ni se consideran sus cifras
-históricas una comparación final bajo el protocolo congelado.
+Los controles ya fueron corregidos: tres folds internos, refit externo completo,
+MLP de 20 épocas e índices de clases coherentes. Para integrar cifras usar
+`results/resumen/controles/`; las cifras históricas no son la referencia final.
 
 ### G4.4 — Revisar servidor y GPU
 
@@ -899,7 +909,9 @@ reentrenar con permutar en inferencia ni anunciar un orden universalmente óptim
 1. Integrar tablas, figuras y metodología con identificadores de corrida.
 2. Revisar afirmaciones contra artefactos y separar hipótesis de hallazgos.
 
-**Entregable:** agregados seleccionados en `docs/resultados/` y discusión unificada.
+**Entregable:** código y agregados seleccionados en `results/resumen/`,
+mapa de evidencia en `docs/resultados.md` y guías de reproducción. La discusión
+final se redactará con el informe.
 **Comprobación:** regeneración y revisión de unidades, soportes y leyendas.
 **Aceptación:** cada afirmación importante identifica objetivo, métrica,
 comparación y límite; incluir resultados desfavorables y no mezclar tareas distintas.
@@ -909,9 +921,10 @@ comparación y límite; incluir resultados desfavorables y no mezclar tareas dis
 **Responsables:** Gael y Johan. **Fecha:** 10/11. **Duración:** dos bloques de
 90–120 min, uno por integrante. **Insumos:** borradores y agregados finales.
 
-1. Cada integrante termina sus borradores según el reparto de la sección 7.
-2. Ambos juntan las secciones, revisan el texto completo, las referencias y el formato.
-3. Comprobar requisitos, siete preguntas mínimas y correspondencia de figuras/tablas.
+1. Confirmar y utilizar el formato específico del profesor antes de redactar.
+2. Cada integrante prepara su parte con las evidencias de la sección 7.
+3. Ambos juntan las secciones, revisan texto, referencias y formato.
+4. Comprobar requisitos, siete preguntas mínimas y correspondencia de figuras/tablas.
 
 **Entregable:** informe PDF y fuentes.
 **Comprobación:** compilación/exportación, inspección del PDF y checklist de sección 7.
@@ -921,7 +934,8 @@ obligatoria sin respuesta. Describir límites, sin convertir el trabajo en diagn
 ### H6.2 — Reproducción
 
 **Responsables:** Gael y Johan. **Fecha:** 10/11. **Duración:** 90–120 min más
-cómputo. **Insumos:** código y manifiestos de corridas.
+cómputo. **Insumos:** código integrado y manifiestos de corridas;
+no depende de terminar el PDF para comprobar la parte técnica.
 
 1. Ejecutar pruebas y corrida corta desde entorno limpio con datos locales.
 2. Regenerar tablas/figuras finales desde los artefactos completos conservados.
@@ -934,7 +948,7 @@ regeneración de reportes de reentrenamiento completo. No prometer igualdad bit 
 
 ### H6.3 — Preparar entrega
 
-**Responsables:** Gael y Johan. **Fecha:** 10/11. **Duración:** 60–90 min.
+**Responsables:** Gael y Johan. **Meta interna:** 12/11. **Duración:** 60–90 min.
 **Insumos:** informe y reproducción aprobados.
 
 1. Preparar ZIP con código y documentación, siguiendo los requisitos del curso.
@@ -946,8 +960,9 @@ regeneración de reportes de reentrenamiento completo. No prometer igualdad bit 
 
 ### F1 — Revisión final
 
-**Responsables:** Gael y Johan. **Fecha:** 11/11. **Duración:** 60–90 min.
-**Insumos:** archivos finales.
+**Responsables:** Gael y Johan. **Fecha:** tras H6.3 y antes de la meta interna.
+**Duración:** 60–90 min. **Insumos:** archivos finales. Revisión del material
+técnico el 11/11; la aceptación final requiere también PDF y ZIP.
 
 1. Corregir erratas, comprobar accesos del repositorio y revisar el checklist final.
 2. Conservar una copia identificada de los archivos que se entregarán.
@@ -957,14 +972,15 @@ regeneración de reportes de reentrenamiento completo. No prometer igualdad bit 
 
 ### F2 — Entrega
 
-**Responsables:** Gael y Johan. **Fecha:** 12/11, antes de las 23:59
-America/Santiago. **Duración:** 30–60 min. **Insumos:** entrega revisada.
+**Responsables:** Gael y Johan. **Fecha oficial:** prórroga anunciada, nueva
+fecha por confirmar. **Meta interna:** 12/11 a las 23:59, America/Santiago.
+**Duración:** 30–60 min. **Insumos:** entrega revisada.
 
 1. Subir los archivos por el mecanismo del curso y comprobar su recepción.
 2. Registrar fecha/hora y evidencia de la entrega.
 
 **Entregable:** entrega recibida y comprobante. **Aceptación:** PDF, ZIP y
-repositorio disponibles según requisitos, dentro del plazo.
+repositorio disponibles según requisitos, dentro del plazo oficial actualizado.
 
 ## 6. Cómputo, presupuesto y coordinación
 
@@ -997,31 +1013,25 @@ una ficha si excede dos horas de trabajo activo.
 
 ### Reparto de las secciones
 
-Propuesta basada en la plantilla del laboratorio, pendiente de confirmar entre
-ambos. La columna de responsable indica quién prepara el primer borrador;
-el informe completo se revisa entre los dos.
+El informe se redactará después con el formato específico del profesor.
+El PDF del enunciado exige un informe en formato laboratorio, pero no fija
+por sí solo los límites por sección. Confirmar la plantilla vigente antes de
+establecer maquetación o extensión; no asumir que el PDF IEEE del respaldo sea
+la entrega correcta.
 
-| Sección | Primer borrador | Máximo según la plantilla |
-|---|---|---|
-| Resumen | Ambos, al terminar el resto del informe | No indicado |
-| Introducción | Johan: problema, objetivos y herramientas utilizadas | 1 página |
-| Marco teórico | Gael explica Conv1D y CORAL; Johan, los modelos de comparación | 1 página |
-| Metodología | Gael describe datos y evaluación; cada uno explica sus experimentos | 2 páginas |
-| Resultados | Cada uno presenta las tablas, gráficos y explicación de sus experimentos | 3 páginas |
-| Discusión | Ambos: qué significan los resultados, sus diferencias y limitaciones | 1 página |
-| Conclusiones | Ambos: principales hallazgos y aprendizajes | 1 página |
-| Código y reproducibilidad | Cada uno explica su código; ambos comprueban cómo repetir el trabajo | 1 página |
+| Contenido | Primer borrador propuesto |
+|---|---|
+| Introducción y contexto | Johan |
+| Conv1D, CORAL, datos y protocolo | Gael |
+| Controles y localidad | Johan |
+| Comparación obligatoria, decisiones, perfiles y robustez | Gael |
+| Resumen, discusión, conclusiones y reproducibilidad | Ambos |
 
-En metodología y resultados, Gael cubre CORAL, comparación obligatoria,
-decisiones, perfiles y robustez; Johan cubre los modelos de comparación y el
-efecto del orden de las preguntas. Incluir las seis tablas obligatorias, las
-configuraciones elegidas y su estabilidad, además de responder las siete
-preguntas siguientes.
-
-Ambos completan las referencias y la rúbrica de autoevaluación de la plantilla.
-Los anexos son opcionales y pueden reunir tablas completas, detalles de pruebas
-y gráficos adicionales. Al juntar el informe, ambos revisan que las partes
-conecten, se respeten los límites de páginas y el PDF final sea legible.
+El reparto orienta la redacción, pero ambos revisan el documento completo.
+`docs/resultados.md` vincula las siete preguntas con evidencia concreta;
+`results/resumen/` conserva las tablas y figuras que se seleccionarán. Las
+casillas siguientes se cerrarán cuando las respuestas estén incorporadas y
+revisadas en el informe, no solo por existir código o resultados.
 
 ### Siete preguntas mínimas
 
@@ -1047,18 +1057,22 @@ pueden acompañar las figuras o ir en anexos; no reemplazan las tablas obligator
 
 ### Checklist de entrega
 
-- [ ] Tres variantes × seis objetivos completas, o cualquier fallo claramente identificado y corregido.
-- [ ] Todas las métricas externas, con media, desviación y convención documentadas.
-- [ ] GDS con configuración base y búsqueda interna omitida, correctamente rotulado.
-- [ ] Probabilidades, splits, candidatas y revisión de código conservados.
-- [ ] Confusiones agregadas de todos los folds y clases originales identificadas.
-- [ ] Estudios previstos y resultados favorables/desfavorables incluidos.
-- [ ] Tablas y figuras regenerables desde las corridas conservadas.
+Las primeras casillas verifican la base técnica del repositorio. El PDF,
+el paquete, los accesos y la recepción tienen comprobaciones propias.
+
+- [x] Tres variantes × seis objetivos completas, o cualquier fallo claramente identificado y corregido.
+- [x] Todas las métricas externas, con media, desviación y convención documentadas.
+- [x] GDS con configuración base y búsqueda interna omitida, correctamente rotulado.
+- [x] Probabilidades, splits, candidatas y revisión de código conservados.
+- [x] Confusiones agregadas de todos los folds y clases originales identificadas.
+- [x] Estudios previstos y resultados favorables/desfavorables incluidos.
+- [x] Tablas y figuras regenerables desde las corridas conservadas.
 - [ ] PDF legible, siete preguntas contestadas y referencias verificadas.
 - [ ] Pruebas y reproducción registradas; ZIP y repositorio coherentes con el PDF.
 - [ ] Datos individuales y archivos ajenos a la entrega excluidos del ZIP y de Git.
 - [ ] Acceso del profesor y ayudantes al repositorio comprobado.
-- [ ] Entrega y recepción registradas antes del 12/11/2026, 23:59 America/Santiago.
+- [ ] Nueva fecha oficial confirmada; entrega y recepción registradas dentro de ese plazo.
+- [ ] Meta interna del 12/11, 23:59 America/Santiago conservada para el cierre.
 
 ## 8. Registro de avances
 
@@ -1094,11 +1108,13 @@ prueba corta no convierte un experimento final en terminado.
 | G5.3 | Gael | 06/11: análisis pareado, recalls/soportes y dirección del error; dos figuras y discusión regeneradas, 57 pruebas aprobadas | Integrar con controles, localidad y robustez |
 | J4.1 | Johan | 07/11: ejecución masiva de los 405 ajustes en los modelos CNN-k3, CNN-k1 y MLP de capacidad próxima, caculando métricas como MAE Ordinal y QWK. | J4.2 |
 | J4.2 | Johan | 07/11: Graficación y análisis por arquitectura (modelo) y orden de características, concluyendo que no hay una diferencia notable entre modelos. | H5.2 |
+| H5.2 | Gael y Johan | 10/11: integración selectiva de controles/localidad y constantes de seis objetivos; agregados cotejados, mapa de evidencia y README preparados. Suite reducida a 14 pruebas esenciales. | H6: revisión de reproducción, informe con formato docente y paquete |
 
 Las salidas locales de G2.5 están en `results/g2_coral/` y
 `results/g2_coral_weighted/`, con `ejecucion.log` en cada carpeta. Son pruebas
-cortas, no resultados finales, y permanecen sin versionar. El resumen de la
-comparación de controles versionado está en `results/controles/`.
+cortas, no resultados finales, y permanecen sin versionar. La comparación corregida
+de controles está en `results/resumen/controles/`; los agregados históricos de
+`results/controles/` no son la referencia para el informe.
 
 ### Registro de arranque H0.2 — 25/10/2026
 

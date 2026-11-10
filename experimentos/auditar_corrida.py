@@ -23,7 +23,7 @@ def require(condition, message):
     if not condition: raise ValueError(message)
 
 
-def auditar(folder, eventos):
+def auditar(folder, eventos, data_path=None):
     folder = Path(folder)
     manifest = json.loads((folder / 'manifest.json').read_text())
     identity = manifest['identity']; config = identity['config']
@@ -45,7 +45,7 @@ def auditar(folder, eventos):
                 expected_ids.add((target,variant,outer,'refit',None,None))
                 if not (target == 'GDS' and config['all_targets']):
                     expected_ids.update((target,variant,outer,'inner',c,i) for c in range(1,5) for i in range(1,4))
-    require(hashlib.sha256(Path(config['data_path']).read_bytes()).hexdigest() == identity['data_sha256'], 'Hash datos')
+    require(hashlib.sha256(Path(data_path if data_path is not None else config['data_path']).read_bytes()).hexdigest() == identity['data_sha256'], 'Hash datos')
     digest = hashlib.sha256()
     for path in [ROOT / 'main.py', ROOT / 'experimentos/reportes.py', *sorted((ROOT / 'src').rglob('*.py'))]:
         digest.update(str(path.relative_to(ROOT)).encode()); digest.update(path.read_bytes())
@@ -150,4 +150,5 @@ def auditar(folder, eventos):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__); p.add_argument('folder'); p.add_argument('--eventos', type=int, required=True)
-    a = p.parse_args(); print(f'Auditoría aprobada: {auditar(a.folder, a.eventos)} eventos')
+    p.add_argument('--data-path', help='SAV alternativo con el mismo SHA-256')
+    a = p.parse_args(); print(f'Auditoría aprobada: {auditar(a.folder, a.eventos, a.data_path)} eventos')

@@ -20,6 +20,9 @@ results/resumen/*
 !results/resumen/perfiles/
 !results/resumen/analisis/
 !results/resumen/robustez/
+!results/resumen/controles/
+!results/resumen/constantes/
+!results/resumen/localidad/
 .DS_Store
 
 # Material exclusivo del profesor (solucion de referencia).

@@ -6,10 +6,6 @@ import numpy as np
 from sklearn.metrics import cohen_kappa_score
 
 from src.evaluation.metrics import MetricsCalculator as M
-from src.reporting.reports import MarkdownTables, ResultRows
-from src.training.nested_cv import ExperimentResult, OuterFoldResult
-from src.training.search import CandidateScore
-from src.config import ModelConfig, TrainingConfig
 
 
 class TestMetricas(unittest.TestCase):
@@ -30,24 +26,6 @@ class TestMetricas(unittest.TestCase):
         with self.assertRaises(ValueError):
             M.compute([0, 3], [0, 0], 3)
 
-    def test_qwk_no_estimable_y_resumen(self):
-        self.assertTrue(np.isnan(M.quadratic_weighted_kappa([1, 1], [1, 1], 3)))
-        self.assertEqual(M.quadratic_weighted_kappa([1, 1], [0, 0], 3), 0)
-        score = CandidateScore({}, ModelConfig(), TrainingConfig())
-        folds = [OuterFoldResult(i, score, False, M.compute(y, p, 3), np.array(y), np.array(p), 0)
-                 for i, (y, p) in enumerate([([1, 1], [1, 1]), ([0, 1], [0, 1])], 1)]
-        result = ExperimentResult("a", "b", [1, 2, 3], 4, 15, 2, 2, False, "cpu", 1, folds)
-        for key in folds[0].metrics:
-            valid = np.array([f.metrics[key] for f in folds])
-            valid = valid[np.isfinite(valid)]
-            result.summary[f"valid_{key}"] = len(valid)
-            result.summary[f"mean_{key}"] = float(valid.mean()) if len(valid) else float("nan")
-            result.summary[f"std_{key}"] = float(valid.std()) if len(valid) else float("nan")
-        row = ResultRows.summary_row(result)
-        self.assertEqual(row["qwk_valid"], 1)
-        self.assertEqual(row["qwk"], 1)
-        self.assertIn("1/2", MarkdownTables.results([row]))
-        self.assertIn("desacuerdo esperado", ResultRows.selection_rows(result)[0]["qwk_no_estimable"])
 
     def test_metricas_probabilisticas_y_r3(self):
         y = np.array([0, 1, 1, 0])

@@ -51,10 +51,10 @@ Cada columna objetivo es un experimento distinto (un modelo por columna):
 Cada columna se recodifica a indices `0 .. K-1` conservando el orden. El
 experimento por defecto es `GDS_R2`.
 
-**Advertencia sobre `GDS`:** la etapa 7 tiene solo 2 muestras, por lo que
-`StratifiedKFold` con 5 folds falla. Con `--all-targets`, `GDS` usa
-`--gds-outer-folds` y `--gds-inner-folds` (2 por defecto). En un experimento
-suelto hay que bajar `--outer-folds` / `--inner-folds` a mano.
+**Excepción de `GDS`:** la etapa 7 tiene solo dos muestras. Se usan dos
+folds externos, configuración base prefijada y búsqueda interna omitida.
+Con `--all-targets` se aplica automáticamente; para GDS suelto hay que indicar
+`--outer-folds 2`. No describir esta evaluación como validación anidada 2×2.
 
 ## Las 15 entradas
 

@@ -1,0 +1,26 @@
+{
+  "filas_oof": 6714,
+  "folds": 27,
+  "data_sha256": "b454a4e5c997be26edb3a187605c2c10da1147ac1ce6cea76d42adbe68b17474",
+  "central_manifest_sha256": "c2be43b1d72c3df9dc871723a010dc50bf52d41e80f63ae9741a4e9607360286",
+  "splits_sha256": {
+    "GDS": "967e426d2fadd4bbf2d11a9a9e44d7d3907408619aa3edbb1b80a59740756d07",
+    "GDS_R1": "d687cd97de08e15a9c685a89b2d6c07e12e6be526f7d9cb21b2185f6e2079f15",
+    "GDS_R2": "8434b1e8ade09178d87f06e63f5742defcfbe130ac353254a06b52db38bf84c0",
+    "GDS_R3": "1b9dbcc334954b03aaf8f21048b0c06e186e436cfa5a04473398a23d591f9604",
+    "GDS_R4": "4986b704e5dfcef81d201d87599e95613af11b3c644a71ef045efff19e40483f",
+    "GDS_R5": "0fe378849fb0259e83b4d3e04bf1d5497c838693c9492f96cc5f4755ac658fe0"
+  },
+  "sources_sha256": {
+    "experimentos/constantes.py": "82eadf201cb8ca564d515e6ef37c1c22adb7c71ac8499508a6f0b360475ac46e",
+    "experimentos/controles.py": "13aa9200f73098cd435f6e3f59cae6a53d4cd9623f36e65ed867d73eabe99508",
+    "experimentos/decisiones.py": "80267203966ed812eb920ceb79651e4e92d7ae1854c8acb79f8ae6c4e07fc85e",
+    "experimentos/perfiles.py": "b5b9cd2e7ca3e2adb24e1627a536fe5a4893fea0968d75b202c48986118bd84a",
+    "src/data/loader.py": "90a94f0117dcf0aa32b5ac8ef35d10218c4e64fc8c0d2e2c37064f654199d292",
+    "src/data/preprocessing.py": "f9ab507184dc7514c22dafb3579665b8e72f3db851641a046439cfdf4f17a405",
+    "src/config.py": "c8e58c94c3ad2a0da045a02e9b7ebaba7ed08a9d689b3188f28806979b09598a",
+    "src/evaluation/metrics.py": "36f6104e0822d2573c9fc1fc3c7b5ac773e84d04ff29f189f906ddee624cc558"
+  },
+  "ddof": 0,
+  "conteos": "Solo entrenamiento externo, sin suavizado; empate hacia la clase menor."
+}

@@ -247,7 +247,7 @@ def discussion(paired, paired_oof, oof, recalls, out):
               'ni una cota que deba respetar el conjunto de modelos OOF. Los seis objetivos usan los mismos registros y los entrenamientos '
               'de los folds se solapan. No se aplican pruebas que traten folds u objetivos como muestras independientes. '
               'Los recalls sin soporte se dejan como no estimables, no como ceros.', '',
-              'La interpretación de estos resultados está en [el informe](../../../docs/informe.md#resultados-de-decisiones-y-perfiles).', '']
+              'El mapa de evidencia está en [resultados](../../../docs/resultados.md#decisiones-y-perfiles).', '']
     (out / 'discusion.md').write_text('\n'.join(lines), encoding='utf-8')
 
 

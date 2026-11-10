@@ -1,0 +1,11 @@
+{
+  "ajustes": 405,
+  "condiciones_oof": 81,
+  "filas_por_condicion": 1119,
+  "epocas": 20,
+  "grid": false,
+  "inner_folds": 0,
+  "hashes_datos_codigo": "verificados",
+  "indices_etiquetas_probabilidades_perdidas": "verificados",
+  "resultado": "aprobada"
+}

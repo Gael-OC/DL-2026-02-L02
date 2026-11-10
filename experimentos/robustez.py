@@ -1,4 +1,5 @@
 """Audita y resume la robustez sin reentrenar: python -m experimentos.robustez."""
+import argparse
 import csv
 import hashlib
 import json
@@ -12,7 +13,7 @@ from experimentos.comparacion import write
 from src.evaluation.metrics import METRIC_KEYS
 
 
-def resumir(output=Path('results/resumen/robustez')):
+def resumir(output=Path('results/resumen/robustez'), data_path=None):
     output = Path(output)
     if output.exists() and any(output.iterdir()):
         raise ValueError(f'Salida no vacía: {output}')
@@ -24,7 +25,7 @@ def resumir(output=Path('results/resumen/robustez')):
                         for kind, n in (('unweighted', 130), ('weighted', 65)))
     identities = []
     for path, n in jobs:
-        auditar(path, n)
+        auditar(path, n, data_path)
         identities.append(json.loads((path / 'manifest.json').read_text())['identity'])
     if len({x['data_sha256'] for x in identities}) != 1 or len({x['code_sha256'] for x in identities}) != 1:
         raise ValueError('Datos o código difieren entre corridas')
@@ -85,4 +86,8 @@ def resumir(output=Path('results/resumen/robustez')):
 
 
 if __name__ == '__main__':
-    resumir()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out', default='results/resumen/robustez')
+    parser.add_argument('--data-path', help='SAV alternativo con el mismo SHA-256')
+    args = parser.parse_args()
+    resumir(args.out, args.data_path)

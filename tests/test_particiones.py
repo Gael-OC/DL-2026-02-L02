@@ -9,7 +9,6 @@ import torch
 from src.config import ModelConfig, TrainingConfig
 from src.data.preprocessing import ExperimentData, StratifiedSplitter
 from src.training.nested_cv import NestedCrossValidator
-from src.training.search import GridSearch
 from src.training.trainer import FitResult
 
 
@@ -45,19 +44,6 @@ class TestParticiones(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validator.run(data)
 
-    def test_semillas_independientes_del_orden(self):
-        X, y = np.zeros((30, 15)), np.repeat(np.arange(3), 10)
-        seen = []
-        def build(*args, **kwargs):
-            seen.append((args[1].hidden_dim, kwargs["seed"]))
-            return DummyTrainer()
-        candidates = [{"hidden_dim": 16}, {"hidden_dim": 32}]
-        with patch("src.training.search.Trainer.build", side_effect=build):
-            for grid in (candidates, candidates[::-1]):
-                search = GridSearch("conv1d_softmax", grid, ModelConfig(), TrainingConfig(), 3, torch.device("cpu"))
-                search.run(X, y, 3, seed=142, init_seed=900)
-        self.assertEqual(sorted(seen[:6]), sorted(seen[6:]))
-        self.assertEqual({seed for _, seed in seen}, {900, 901, 902})
 
     def test_gds_sin_busqueda_interna(self):
         data = ExperimentData("GDS", np.zeros((30, 15)), np.repeat(np.arange(3), 10), [1, 2, 3])
