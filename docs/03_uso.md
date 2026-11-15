@@ -194,7 +194,8 @@ los comandos centrales. La [guía de resultados](../results/README.md) cubre
 controles, constantes, decisiones, perfiles, localidad y robustez, distinguiendo
 regeneración de agregados y reentrenamiento.
 
-Los manifiestos conservan las versiones originales de cada corrida.
-La reproducción desde otro entorno se revisará en H6.2; no se promete igualdad
-bit a bit entre dispositivos. Para limitar CPU usar
+Las versiones científicas usadas en la comprobación están fijadas en
+`environment.yml`. Los manifiestos conservan las versiones originales de cada
+corrida; la referencia central registró NumPy 2.1.3 y el entorno actual 2.2.6.
+No se promete igualdad bit a bit entre dispositivos. Para limitar CPU usar
 `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1`.

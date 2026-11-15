@@ -1,8 +1,8 @@
-# Evidencia para preparar el informe
+# Mapa de evidencia del laboratorio
 
-Este documento organiza el material técnico del laboratorio. La redacción,
-la estructura y la maquetación del informe se harán después con el formato
-específico del profesor. No se incorpora el PDF ni la fuente IEEE del respaldo.
+Este documento relaciona los requisitos y las preguntas del enunciado con el
+código, las tablas y las comprobaciones del repositorio. El informe técnico
+se entrega por separado en PDF.
 
 ## Cumplimiento del enunciado
 
@@ -11,19 +11,19 @@ implementar y comparar modelos categóricos y ordinales con Conv1D en los seis
 objetivos; no exige que CORAL supere a Softmax. Los controles y los estudios
 adicionales amplían esa comparación, sin sustituir las tablas obligatorias.
 
-| Requisito | Evidencia disponible | Pendiente para la entrega |
+| Requisito | Evidencia | En el informe |
 |---|---|---|
-| Representar las 15 respuestas como secuencia | [Datos](01_problema.md), [arquitectura](02_arquitectura.md), `src/data/dataset.py` | Explicarlo en el informe |
-| Softmax y CORAL sobre el mismo tronco | `src/models/blocks.py`, `src/models/conv_softmax.py`, `src/models/coral.py` | Presentar arquitectura y formas |
-| Niveles, pérdida, inferencia y pesos ordinales | [Implementación CORAL](04_extension_ordinal.md), `src/tasks/ordinal_task.py`, `tests/test_coral.py` | Justificar consistencia y ponderación |
-| Selección interna MAE/QWK y refit externo | `src/training/search.py`, `src/training/nested_cv.py`, registros auditados | Explicar protocolo y excepción GDS |
-| Tres variantes × seis objetivos y nueve métricas externas | [Tablas centrales](../results/resumen/central/comparacion.md) | Llevar las seis tablas al formato docente |
-| Análisis del grid | [Configuraciones elegidas](../results/resumen/central/configuraciones.csv), [robustez](../results/resumen/robustez/selecciones.csv) | Sintetizar variación entre folds |
-| Siete preguntas mínimas | Mapa de la sección siguiente | Redactar y revisar las respuestas finales |
-| Código modular, ZIP, repositorio e informe PDF | Código, pruebas, agregados y comandos en este repositorio | Informe, paquete, acceso docente y recepción |
+| Representar las 15 respuestas como secuencia | [Datos](01_problema.md), [arquitectura](02_arquitectura.md), `src/data/dataset.py` | Secciones II y III |
+| Softmax y CORAL sobre el mismo tronco | `src/models/blocks.py`, `src/models/conv_softmax.py`, `src/models/coral.py` | Sección III, Fig. 1 |
+| Niveles, pérdida, inferencia y pesos ordinales | [Implementación CORAL](04_extension_ordinal.md), `src/tasks/ordinal_task.py`, `tests/test_coral.py` | Sección II |
+| Selección interna MAE/QWK y refit externo | `src/training/search.py`, `src/training/nested_cv.py`, registros auditados | Sección III, Fig. 2 |
+| Tres variantes × seis objetivos y nueve métricas externas | [Tablas centrales](../results/resumen/central/comparacion.md) | Sección IV y Apéndice A |
+| Análisis del grid | [Configuraciones elegidas](../results/resumen/central/configuraciones.csv), [robustez](../results/resumen/robustez/selecciones.csv) | Sección IV y Apéndice B |
+| Siete preguntas mínimas | Mapa de la sección siguiente | Sección V |
+| Comparación con el Laboratorio 01 (opcional) | Medias externas del Laboratorio 01 frente a [las tablas centrales](../results/resumen/central/comparacion.md) | Sección IV |
+| Código modular, repositorio e informe | Código, pruebas, agregados y comandos en este repositorio | Sección VII |
 
-La parte técnica obligatoria tiene implementación y resultados. El laboratorio
-no está entregado ni se considera terminado como documento académico.
+La comparación obligatoria tiene implementación, resultados y pruebas.
 
 ## Siete preguntas: dónde buscar la evidencia
 
@@ -105,6 +105,15 @@ con particiones 314/2718 e inicialización base 42. En R1, Softmax conserva meno
 MAE en las tres particiones; en R2, la comparación cambia de signo en 314.
 NLL y RPS favorecen a Softmax en ambas tareas y las tres particiones.
 
+## Comparación con el Laboratorio 01
+
+Se comparan las medias externas del Laboratorio 01 (MLP) con las de este
+laboratorio (Conv1D) para Softmax y CORAL. Ambos usan el mismo esquema de
+partición externa (5 folds estratificados con semilla 42; 2 para GDS). La
+comparación cambia a la vez el tronco, la grilla y la inicialización, y CORAL
+ponderada usó otra búsqueda de β, por lo que no aísla el efecto de la
+convolución.
+
 ## Comprobación y límites
 
 Comprobaciones realizadas sobre el código integrado:
@@ -113,6 +122,9 @@ La suite actual conserva 14 pruebas esenciales con datos sintéticos. Se
 retiraron los casos repetidos y la infraestructura de pruebas de portabilidad
 y reanudación. Las auditorías de corridas siguen disponibles como comandos.
 
+- Las 14 pruebas esenciales aprobaron tras la reducción de la suite.
+- Inicio de una época y validación 2×2 de Softmax, CORAL y CORAL ponderada
+  completados; son pruebas de funcionamiento, no nuevos resultados finales.
 - Regeneración de centrales, robustez, perfiles y decisiones con igualdad de CSV.
 - Controles: 260 ajustes y selección/refit auditados; localidad: 405 folds,
   81 condiciones, cobertura, probabilidades y pérdidas de 20 épocas verificadas.
@@ -126,14 +138,10 @@ cada bloque. La integración conserva el núcleo `main.py`, `src/` y
 `experimentos/reportes.py` para mantener la identidad de las corridas centrales.
 Los ejecutores de controles y localidad coinciden con los hashes de sus
 artefactos locales. Las auditorías se ejecutan explícitamente al verificar
-las corridas; no forman parte de la suite reducida. La reproducción final se
-revisará en H6.2.
+las corridas; no forman parte de la suite reducida.
 
 Los folds y particiones comparten observaciones; su dispersión no es un intervalo
 de confianza. Las seis etiquetas provienen de las mismas filas y no son seis
 muestras independientes. No se atribuye causalidad, capacidad diagnóstica ni
 procedencia confirmada del instrumento a estos resultados. Las clases extremas
 y los perfiles ambiguos limitan su interpretación.
-
-La revisión del texto, las referencias, la autoevaluación y los límites de
-páginas quedan para el informe conforme a la plantilla vigente del profesor.
